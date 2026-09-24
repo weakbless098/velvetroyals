@@ -1,0 +1,97 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QA Seed — Velvet Royals Flowershop</title>
+    <style>
+        body { font-family: monospace; background: #1a1a1a; color: #e0e0e0; padding: 32px; max-width: 700px; margin: auto; }
+        h1 { color: #b68d40; margin-bottom: 8px; }
+        p.sub { color: #888; margin-bottom: 32px; }
+        .log { background: #111; border: 1px solid #333; border-radius: 8px; padding: 20px; white-space: pre-wrap; line-height: 1.8; font-size: 0.9em; }
+        .ok   { color: #5cb85c; }
+        .skip { color: #f0ad4e; }
+        .err  { color: #d9534f; }
+        .info { color: #5bc0de; }
+        button { margin-top: 24px; background: #b68d40; color: #fff; border: none; padding: 12px 32px; font-size: 1em; border-radius: 6px; cursor: pointer; }
+        button:hover { background: #a07830; }
+        button:disabled { background: #555; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+    <h1>QA Seed Tool</h1>
+    <p class="sub">Adds test products to Firebase for automated QA. Open this page while logged into the site.</p>
+    <div class="log" id="log">Ready. Click "Run Seed" to start.</div>
+    <button id="run-btn" onclick="runSeed()">Run Seed</button>
+
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="js/firebase-config.js"></script>
+    <script>
+    const QA_PRODUCTS = [
+        { name: 'QA Rose',        price: 10.99, category: 'flower',      description: 'QA test flower — vibrant red rose.',      image: 'https://images.unsplash.com/photo-1518895949257-7621c3c786d7?w=400&h=400&fit=crop' },
+        { name: 'QA Tulip',       price: 8.49,  category: 'flower',      description: 'QA test flower — elegant pink tulip.',     image: 'https://images.unsplash.com/photo-1551074313-802101ec6b24?w=400&h=400&fit=crop' },
+        { name: 'QA Sunflower',   price: 12.00, category: 'flower',      description: 'QA test flower — bright sunflower.',       image: 'https://images.unsplash.com/photo-1597848848267-d4ef3798ecc2?w=400&h=400&fit=crop' },
+        { name: 'QA Bouquet',     price: 5.00,  category: 'arrangement', description: 'QA test arrangement — classic bouquet.',   image: 'https://images.unsplash.com/photo-1563241527-3004b7be0b1f?w=400&h=400&fit=crop' },
+        { name: 'QA Gift Box',    price: 8.00,  category: 'arrangement', description: 'QA test arrangement — elegant gift box.',  image: 'https://images.unsplash.com/photo-1595152452543-e5fc28ebc2b8?w=400&h=400&fit=crop' },
+        { name: 'QA Basket',      price: 10.00, category: 'arrangement', description: 'QA test arrangement — wicker basket.',     image: 'https://images.unsplash.com/photo-1487530811015-780aebfeeb3b?w=400&h=400&fit=crop' },
+        { name: 'QA Chocolates',  price: 7.99,  category: 'gift',        description: 'QA test gift — assorted chocolates.',      image: 'https://images.unsplash.com/photo-1549007994-cb92caebd54b?w=400&h=400&fit=crop' },
+        { name: 'QA Mug',         price: 5.99,  category: 'gift',        description: 'QA test gift — ceramic mug.',              image: 'https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=400&h=400&fit=crop' },
+        { name: 'QA Stuff Toy',   price: 9.99,  category: 'gift',        description: 'QA test gift — plush toy bear.',           image: 'https://images.unsplash.com/photo-1570464197285-9949814674a7?w=400&h=400&fit=crop' },
+    ];
+
+    const logEl = document.getElementById('log');
+    const line = (msg, cls = '') => {
+        logEl.innerHTML += `<span class="${cls}">${msg}</span>\n`;
+    };
+
+    async function runSeed() {
+        document.getElementById('run-btn').disabled = true;
+        logEl.innerHTML = '';
+
+        line('---- Velvet Royals Flowershop QA Seed ----\n', 'info');
+        line('Reading existing products...', 'info');
+
+        const snapshot = await flowersRef.once('value');
+        const existing = {};
+        snapshot.forEach(child => { existing[child.val().name] = true; });
+        line(`Found ${Object.keys(existing).length} existing products.\n`);
+
+        let added = 0, skipped = 0;
+        for (const product of QA_PRODUCTS) {
+            if (existing[product.name]) {
+                line(`  [SKIP] ${product.name}`, 'skip');
+                skipped++;
+                continue;
+            }
+            const key = flowersRef.push().key;
+            await flowersRef.child(key).set({ id: key, ...product });
+            line(`  [+] ${product.category.padEnd(12)} ${product.name.padEnd(16)} $${product.price.toFixed(2)}`, 'ok');
+            added++;
+        }
+
+        line(`\nAdded: ${added}  Skipped: ${skipped}`);
+
+        // Summary
+        const after = await flowersRef.once('value');
+        const counts = { arrangement: 0, flower: 0, gift: 0 };
+        after.forEach(child => {
+            const cat = child.val().category || 'flower';
+            if (counts[cat] !== undefined) counts[cat]++;
+        });
+
+        line('\n---- Database summary ----');
+        line(`  Arrangements : ${counts.arrangement}`, counts.arrangement > 0 ? 'ok' : 'err');
+        line(`  Flowers      : ${counts.flower}`,      counts.flower      > 0 ? 'ok' : 'err');
+        line(`  Gifts        : ${counts.gift}`,        counts.gift        > 0 ? 'ok' : 'err');
+        line(`  Total        : ${counts.arrangement + counts.flower + counts.gift}`);
+        line('\nDone! Products are live in Firebase.', 'ok');
+
+        document.getElementById('run-btn').disabled = false;
+        document.getElementById('run-btn').textContent = 'Run Again';
+    }
+    </script>
+</body>
+</html>
+

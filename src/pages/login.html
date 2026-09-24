@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Sign in or create an account at Velvet Royals Flowershop | premium flowers delivered to your door.">
+    <title>Sign In | Velvet Royals Flowershop</title>
+    <link rel="icon" type="image/png" href="../images/favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --gold:        #C8A43A;
+            --gold-light:  #D4B84A;
+            --gold-dark:   #A87010;
+            --cream:       #F5EDE0;
+            --cream-warm:  #EDD9B8;
+            --dark:        #2C1A05;
+            --dark-mid:    #3D2E10;
+            --text:        #2C1A05;
+            --text-muted:  #6B5240;
+            --white:       #ffffff;
+            --border:      #E0C8A0;
+            --radius:      12px;
+            --transition:  0.25s ease;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1A1005 0%, #3D2E10 45%, #2C1A05 100%);
+            padding: 20px;
+        }
+
+        /* ===== Auth Card ===== */
+        .auth-card {
+            background: var(--white);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 480px;
+            box-shadow: 0 32px 80px rgba(0,0,0,0.35);
+            overflow: hidden;
+        }
+
+        /* ===== Brand Header ===== */
+        .auth-brand {
+            background: var(--cream);
+            border-bottom: 1px solid var(--border);
+            padding: 32px 40px 28px;
+            text-align: center;
+            position: relative;
+        }
+
+        .auth-brand::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 60px; height: 2px;
+            background: var(--gold);
+            border-radius: 2px;
+        }
+
+        .auth-brand-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6em;
+            font-weight: 700;
+            color: var(--text);
+            letter-spacing: 1px;
+        }
+
+        .auth-brand-logo {
+            width: auto;
+            height: 112px;
+            object-fit: contain;
+            margin-bottom: 8px;
+        }
+
+        .auth-brand-tagline {
+            font-size: 0.72em;
+            color: var(--gold-dark);
+            font-weight: 600;
+            margin-top: 4px;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+        }
+
+        /* ===== Mode Toggle (Customer / Admin) ===== */
+        .mode-toggle {
+            display: flex;
+            margin: 24px 32px 0;
+            background: var(--cream);
+            border-radius: 8px;
+            padding: 4px;
+            gap: 4px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 9px 0;
+            border: none;
+            background: transparent;
+            border-radius: 6px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85em;
+            font-weight: 500;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all var(--transition);
+        }
+
+        .mode-btn.active {
+            background: var(--white);
+            color: var(--text);
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+        }
+
+        /* ===== Form Body ===== */
+        .auth-body {
+            padding: 24px 32px 32px;
+        }
+
+        /* ===== Tab Toggle (Login / Register) ===== */
+        .tab-toggle {
+            display: flex;
+            gap: 0;
+            border-bottom: 2px solid var(--border);
+            margin-bottom: 24px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            background: none;
+            border: none;
+            padding: 10px 0;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9em;
+            font-weight: 500;
+            color: var(--text-muted);
+            cursor: pointer;
+            position: relative;
+            transition: color var(--transition);
+        }
+
+        .tab-btn.active {
+            color: var(--gold);
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px; left: 0; right: 0;
+            height: 2px;
+            background: var(--gold);
+            border-radius: 2px;
+        }
+
+        /* ===== Form Groups ===== */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.82em;
+            font-weight: 500;
+            color: var(--text);
+            margin-bottom: 6px;
+            letter-spacing: 0.3px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9em;
+            color: var(--text);
+            background: var(--cream);
+            transition: border-color var(--transition), box-shadow var(--transition);
+            outline: none;
+        }
+
+        .form-group input:focus {
+            border-color: var(--gold);
+            background: var(--white);
+            box-shadow: 0 0 0 3px rgba(182,141,64,0.12);
+        }
+
+        .admin-key-hint {
+            font-size: 0.76em;
+            color: var(--text-muted);
+            margin-top: 5px;
+            font-weight: 300;
+        }
+
+        /* ===== Buttons ===== */
+        .btn-primary {
+            width: 100%;
+            padding: 13px;
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+            color: var(--dark);
+            border: none;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.92em;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: background var(--transition), box-shadow var(--transition), transform 0.15s;
+            letter-spacing: 0.3px;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold) 100%);
+            box-shadow: 0 4px 16px rgba(200,164,58,0.35);
+        }
+
+        .btn-primary:active { transform: scale(0.98); }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-guest {
+            width: 100%;
+            padding: 11px;
+            background: transparent;
+            color: var(--text-muted);
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85em;
+            font-weight: 500;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all var(--transition);
+        }
+
+        .btn-guest:hover {
+            border-color: var(--text-muted);
+            color: var(--text);
+        }
+
+        /* ===== Divider ===== */
+        .auth-divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 16px 0;
+            color: var(--text-muted);
+            font-size: 0.8em;
+        }
+
+        .auth-divider::before,
+        .auth-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        /* ===== Error / Success Messages ===== */
+        .auth-message {
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 0.85em;
+            margin-bottom: 14px;
+            display: none;
+        }
+
+        .auth-message.error {
+            background: #fef2f2;
+            color: #c0392b;
+            border: 1px solid #f5c6c6;
+            display: block;
+        }
+
+        .auth-message.success {
+            background: #f0faf0;
+            color: #27ae60;
+            border: 1px solid #a9dfbf;
+            display: block;
+        }
+
+        /* ===== Back Link ===== */
+        .auth-back {
+            display: block;
+            text-align: center;
+            margin-top: 18px;
+            font-size: 0.82em;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color var(--transition);
+        }
+
+        .auth-back:hover { color: var(--gold); }
+
+        /* ===== Forgot / Reset Password ===== */
+        .forgot-link {
+            display: inline-block;
+            font-size: 0.78em;
+            color: var(--gold);
+            text-decoration: none;
+            margin-top: 5px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            transition: color var(--transition);
+        }
+        .forgot-link:hover { color: var(--gold-light); text-decoration: underline; }
+
+        .reset-panel {
+            background: #faf8f5;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px 18px;
+            margin-top: 14px;
+            animation: fadeIn 0.2s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-4px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .reset-panel p {
+            font-size: 0.82em;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+        .reset-panel .form-group { margin-bottom: 10px; }
+        .reset-row {
+            display: flex;
+            gap: 8px;
+        }
+        .reset-row input {
+            flex: 1;
+            padding: 9px 12px;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.88em;
+            color: var(--text);
+            background: var(--white);
+            outline: none;
+            transition: border-color var(--transition), box-shadow var(--transition);
+        }
+        .reset-row input:focus {
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px rgba(182,141,64,0.12);
+        }
+        .btn-reset {
+            padding: 9px 16px;
+            background: var(--gold);
+            color: var(--white);
+            border: none;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background var(--transition);
+            white-space: nowrap;
+        }
+        .btn-reset:hover { background: var(--gold-light); }
+        .btn-reset:disabled { opacity: 0.6; cursor: not-allowed; }
+        .reset-message {
+            font-size: 0.8em;
+            margin-top: 8px;
+            display: none;
+            padding: 7px 10px;
+            border-radius: 6px;
+        }
+        .reset-message.success {
+            display: block;
+            background: #f0faf0;
+            color: #27ae60;
+            border: 1px solid #a9dfbf;
+        }
+        .reset-message.error {
+            display: block;
+            background: #fef2f2;
+            color: #c0392b;
+            border: 1px solid #f5c6c6;
+        }
+
+        /* ===== Hidden ===== */
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <div class="auth-card">
+        <div class="auth-brand">
+            <img src="../images/logo-auth.png" alt="Velvet Royals Flowershop Logo" class="auth-brand-logo">
+            <div class="auth-brand-name">Velvet Royals Flowershop</div>
+            <div class="auth-brand-tagline">Artisan Floral Studio</div>
+        </div>
+
+        <div class="mode-toggle">
+            <button class="mode-btn active" id="btn-customer-mode" onclick="setMode('customer')">Customer</button>
+            <button class="mode-btn" id="btn-admin-mode" onclick="setMode('admin')">Admin</button>
+        </div>
+
+        <div class="auth-body">
+            <div id="auth-message" class="auth-message"></div>
+
+            <div class="tab-toggle">
+                <button class="tab-btn active" id="tab-login" onclick="setTab('login')">Sign In</button>
+                <button class="tab-btn" id="tab-register" onclick="setTab('register')">Register</button>
+            </div>
+
+            <form id="login-form" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="login-email">Email Address</label>
+                    <input type="email" id="login-email" placeholder="your@email.com" required autocomplete="email">
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" placeholder="Your password" required autocomplete="current-password">
+                    <button type="button" class="forgot-link" onclick="toggleResetPanel()">Forgot password?</button>
+                </div>
+
+                <div id="reset-panel" class="reset-panel hidden">
+                    <p>Enter your email address and we'll send you a link to reset your password.</p>
+                    <div class="reset-row">
+                        <input type="email" id="reset-email" placeholder="your@email.com" autocomplete="off">
+                        <button type="button" class="btn-reset" id="reset-btn" onclick="handleForgotPassword()">Send Link</button>
+                    </div>
+                    <div id="reset-message" class="reset-message"></div>
+                </div>
+
+                <button type="submit" class="btn-primary" id="login-submit">Sign In</button>
+            </form>
+
+            <form id="register-form" class="hidden" onsubmit="handleRegister(event)">
+                <div class="form-group">
+                    <label for="reg-name">Full Name</label>
+                    <input type="text" id="reg-name" placeholder="Your full name" required autocomplete="name">
+                </div>
+                <div class="form-group">
+                    <label for="reg-email">Email Address</label>
+                    <input type="email" id="reg-email" placeholder="your@email.com" required autocomplete="email" oninput="this.style.borderColor='';clearMessage()">
+                </div>
+                <div class="form-group">
+                    <label for="reg-password">Password</label>
+                    <input type="password" id="reg-password" placeholder="Min. 6 characters" required autocomplete="new-password" minlength="6">
+                </div>
+                <button type="submit" class="btn-primary" id="register-submit">Create Account</button>
+            </form>
+
+            <div id="guest-section">
+                <div class="auth-divider">or</div>
+                <button class="btn-guest" onclick="authModule.continueAsGuest()">Continue as Guest</button>
+            </div>
+
+            <a href="../index.html" class="auth-back">Back to store</a>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="../js/firebase-config.js"></script>
+    <script src="../js/auth.js"></script>
+    <script>
+        let currentMode = 'customer'; // 'customer' | 'admin'
+        let currentTab  = 'login';   // 'login'    | 'register'
+        let loginAuthRedirected = false;
+
+        // Check URL params for mode and return URL
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('mode') === 'admin') setMode('admin');
+
+        // Guard the redirect so a valid session is only redirected once even if
+        // Firebase fires multiple auth-state-change events on page refresh.
+        firebase.auth().onAuthStateChanged(user => {
+            if (!user) {
+                loginAuthRedirected = false;
+                return;
+            }
+            if (loginAuthRedirected) return;
+            loginAuthRedirected = true;
+            redirectAfterLogin(user);
+        });
+
+        function setMode(mode) {
+            currentMode = mode;
+            document.getElementById('btn-customer-mode').classList.toggle('active', mode === 'customer');
+            document.getElementById('btn-admin-mode').classList.toggle('active', mode === 'admin');
+            document.getElementById('guest-section').classList.toggle('hidden', mode === 'admin');
+            // Admin mode: hide register tab | admin accounts are provisioned by the store owner
+            document.getElementById('tab-register').classList.toggle('hidden', mode === 'admin');
+            if (mode === 'admin') setTab('login');
+            clearMessage();
+        }
+
+        function setTab(tab) {
+            currentTab = tab;
+            document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+            document.getElementById('tab-register').classList.toggle('active', tab === 'register');
+            document.getElementById('login-form').classList.toggle('hidden', tab !== 'login');
+            document.getElementById('register-form').classList.toggle('hidden', tab !== 'register');
+            clearMessage();
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const email    = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value;
+            const btn      = document.getElementById('login-submit');
+
+            btn.disabled = true;
+            btn.textContent = 'Signing in...';
+            clearMessage();
+
+            try {
+                const result = await authModule.login(email, password);
+                const data = await authModule.getUserData(result.user.uid);
+                const role = data ? data.role : 'user';
+
+                if (currentMode === 'admin' && role !== 'admin') {
+                    await authModule.logout();
+                    showMessage('This account does not have admin access.', 'error');
+                    btn.disabled = false;
+                    btn.textContent = 'Sign In';
+                    return;
+                }
+
+                if (currentMode === 'customer' && role === 'admin') {
+                    await authModule.logout();
+                    showMessage('Admin accounts must sign in using the Admin tab.', 'error');
+                    btn.disabled = false;
+                    btn.textContent = 'Sign In';
+                    return;
+                }
+
+                redirectAfterLogin(result.user, role);
+            } catch (err) {
+                showMessage(friendlyError(err.code), 'error');
+                btn.disabled = false;
+                btn.textContent = 'Sign In';
+            }
+        }
+
+        async function handleRegister(e) {
+            e.preventDefault();
+            const name       = document.getElementById('reg-name').value.trim();
+            const email      = document.getElementById('reg-email').value.trim();
+            const password   = document.getElementById('reg-password').value;
+            const btn        = document.getElementById('register-submit');
+            const emailInput = document.getElementById('reg-email');
+
+            btn.disabled = true;
+            btn.textContent = 'Creating account...';
+            clearMessage();
+            emailInput.style.borderColor = '';
+
+            try {
+                await authModule.register(name, email, password);
+                loginAuthRedirected = true;
+                showMessage('Account created! Redirecting...', 'success');
+                setTimeout(() => redirectAfterLogin(firebase.auth().currentUser), 1000);
+            } catch (err) {
+                if (err.code === 'auth/email-already-in-use') {
+                    emailInput.style.borderColor = '#c0392b';
+                    emailInput.focus();
+                    showMessageWithAction(
+                        'An account with this email already exists.',
+                        'Sign In instead',
+                        () => setTab('login')
+                    );
+                } else {
+                    showMessage(friendlyError(err.code), 'error');
+                }
+                btn.disabled = false;
+                btn.textContent = 'Create Account';
+            }
+        }
+
+        async function redirectAfterLogin(user, role) {
+            if (!user) return;
+            loginAuthRedirected = true;
+
+            // Get role if not provided
+            if (!role) {
+                const data = await authModule.getUserData(user.uid);
+                role = data ? data.role : 'user';
+            }
+
+            // Check for return URL | only allow same-origin relative paths
+            const returnUrl = params.get('return');
+            if (returnUrl) {
+                try {
+                    const resolved = new URL(returnUrl, window.location.origin);
+                    if (resolved.origin === window.location.origin && !resolved.pathname.includes('login')) {
+                        window.location.href = resolved.pathname + resolved.search + resolved.hash;
+                        return;
+                    }
+                } catch {}
+            }
+
+            // Redirect by role
+            if (role === 'admin') {
+                window.location.href = 'admin.html';
+            } else {
+                window.location.href = '../index.html';
+            }
+        }
+
+        function showMessage(msg, type) {
+            const el = document.getElementById('auth-message');
+            el.textContent = msg;
+            el.className = 'auth-message ' + type;
+        }
+
+        function showMessageWithAction(msg, actionLabel, actionFn) {
+            const el = document.getElementById('auth-message');
+            el.className = 'auth-message error';
+            el.innerHTML = '';
+            const text = document.createTextNode(msg + ' ');
+            const btn = document.createElement('button');
+            btn.textContent = actionLabel;
+            btn.style.cssText = 'background:none;border:none;padding:0;color:#c0392b;font-weight:700;font-family:inherit;font-size:inherit;cursor:pointer;text-decoration:underline;';
+            btn.onclick = actionFn;
+            el.appendChild(text);
+            el.appendChild(btn);
+        }
+
+        function clearMessage() {
+            const el = document.getElementById('auth-message');
+            el.className = 'auth-message';
+            el.innerHTML = '';
+        }
+
+        function friendlyError(code) {
+            const map = {
+                'auth/invalid-email':           'Please enter a valid email address.',
+                'auth/user-not-found':          'No account found with this email.',
+                'auth/wrong-password':          'Incorrect password. Please try again.',
+                'auth/email-already-in-use':    'An account with this email already exists.',
+                'auth/weak-password':           'Password must be at least 6 characters.',
+                'auth/too-many-requests':       'Too many attempts. Please try again later.',
+                'auth/invalid-credential':      'Invalid email or password.'
+            };
+            return map[code] || 'Something went wrong. Please try again.';
+        }
+
+        // ===== Forgot Password =====
+        function toggleResetPanel() {
+            const panel = document.getElementById('reset-panel');
+            const isHidden = panel.classList.contains('hidden');
+            panel.classList.toggle('hidden', !isHidden);
+
+            if (isHidden) {
+                // Pre-fill reset email from login field
+                const loginEmail = document.getElementById('login-email').value.trim();
+                if (loginEmail) {
+                    document.getElementById('reset-email').value = loginEmail;
+                }
+                document.getElementById('reset-message').className = 'reset-message';
+                document.getElementById('reset-message').textContent = '';
+            }
+        }
+
+        async function handleForgotPassword() {
+            const email = document.getElementById('reset-email').value.trim();
+            const btn   = document.getElementById('reset-btn');
+            const msg   = document.getElementById('reset-message');
+
+            if (!email) {
+                msg.className = 'reset-message error';
+                msg.textContent = 'Please enter your email address.';
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = 'Sending...';
+            msg.className = 'reset-message';
+            msg.textContent = '';
+
+            try {
+                await firebase.auth().sendPasswordResetEmail(email);
+                msg.className = 'reset-message success';
+                msg.textContent = '✓ Reset link sent! Check your inbox (and spam folder).';
+                btn.textContent = 'Sent!';
+            } catch (err) {
+                msg.className = 'reset-message error';
+                const errMap = {
+                    'auth/user-not-found':  'No account found with this email.',
+                    'auth/invalid-email':   'Please enter a valid email address.',
+                    'auth/too-many-requests': 'Too many attempts. Please try again later.'
+                };
+                msg.textContent = errMap[err.code] || 'Failed to send reset email. Please try again.';
+                btn.disabled = false;
+                btn.textContent = 'Send Link';
+            }
+        }
+    </script>
+</body>
+</html>
+

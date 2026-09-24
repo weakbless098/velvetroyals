@@ -1,0 +1,108 @@
+{
+  "rules": {
+
+    "flowers": {
+      ".read": true,
+      ".write": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin'",
+      "$flowerId": {
+        ".validate": "newData.hasChildren(['name','price','category']) && newData.child('price').isNumber() && newData.child('price').val() > 0 && newData.child('name').val().length > 0"
+      }
+    },
+
+    "orders": {
+      ".read": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin'",
+      ".indexOn": ["uid", "status", "timestamp"],
+      "$orderId": {
+        ".read": "auth != null && (data.child('uid').val() === auth.uid || root.child('users').child(auth.uid).child('role').val() === 'admin')",
+        ".write": "(!data.exists() && newData.exists()) || (auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin')",
+        ".validate": "newData.hasChildren(['items','total','timestamp']) && newData.child('total').isNumber() && newData.child('total').val() > 0 && ((auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin') || (newData.child('status').val() === 'pending' && newData.child('paymentStatus').val() === 'pending payment' && !newData.hasChild('paidAt') && !newData.hasChild('stockApplied') && !newData.hasChild('paymentSession') && !newData.hasChild('priceCheck') && !newData.hasChild('notifiedAt') && !newData.hasChild('lastPaymentAttempt') && !newData.hasChild('source') && !newData.hasChild('offline') && (!newData.hasChild('uid') || (auth != null && newData.child('uid').val() === auth.uid))))"
+      }
+    },
+
+    "order-tracking": {
+      ".indexOn": ["trackingId"],
+      "$orderId": {
+        ".read": true,
+        ".write": "(!data.exists() && newData.exists()) || (auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin')",
+        ".validate": "newData.hasChildren(['status','timestamp']) && ((auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin') || (newData.child('status').val() === 'pending' && !newData.hasChild('paymentStatus') && root.child('orders').child($orderId).exists()))"
+      }
+    },
+
+    "user-orders": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid"
+      }
+    },
+
+    "carts": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid"
+      }
+    },
+
+    "users": {
+      "$uid": {
+        ".read": "auth != null && (auth.uid === $uid || root.child('users').child(auth.uid).child('role').val() === 'admin')",
+        ".write": "auth != null && auth.uid === $uid",
+        "role": {
+          ".write": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'admin' || !data.exists())",
+          ".validate": "newData.val() === 'user' || root.child('users').child(auth.uid).child('role').val() === 'admin'"
+        }
+      }
+    },
+
+    "reviews": {
+      ".read": true,
+      ".indexOn": ["timestamp"],
+      "$reviewId": {
+        ".write": "(!data.exists() && newData.exists()) || (auth != null && (data.child('uid').val() === auth.uid || root.child('users').child(auth.uid).child('role').val() === 'admin'))",
+        ".validate": "newData.hasChildren(['name','rating','text','timestamp']) && newData.child('name').isString() && newData.child('name').val().length > 0 && newData.child('name').val().length <= 60 && newData.child('rating').isNumber() && newData.child('rating').val() >= 1 && newData.child('rating').val() <= 5 && newData.child('text').isString() && newData.child('text').val().length >= 10 && newData.child('text').val().length <= 500 && newData.child('timestamp').isNumber() && (!newData.hasChild('uid') || (auth != null && newData.child('uid').val() === auth.uid)) && ((auth == null && newData.child('isGuest').val() === true) || (auth != null && newData.child('isGuest').val() !== true))"
+      }
+    },
+
+    "contactMessages": {
+      ".read": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin'",
+      ".indexOn": ["sentAt"],
+      "$messageId": {
+        ".write": "(!data.exists() && newData.exists()) || (auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin')",
+        ".validate": "(auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin') || (newData.hasChildren(['name','message','sentAt']) && newData.child('name').isString() && newData.child('name').val().length > 0 && newData.child('name').val().length <= 100 && newData.child('message').isString() && newData.child('message').val().length > 0 && newData.child('message').val().length <= 2000 && (!newData.hasChild('email') || (newData.child('email').isString() && newData.child('email').val().length <= 200)) && (!newData.hasChild('phone') || (newData.child('phone').isString() && newData.child('phone').val().length <= 40)) && (!newData.hasChild('subject') || (newData.child('subject').isString() && newData.child('subject').val().length <= 60)) && newData.child('status').val() === 'unread')"
+      }
+    },
+
+    "productWishlists": {
+      ".read": true,
+      "$productId": {
+        "$uid": {
+          ".write": "auth != null && auth.uid === $uid"
+        }
+      }
+    },
+
+    "coupons": {
+      ".read": true,
+      ".write": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin'",
+      "$couponId": {
+        ".validate": "newData.hasChildren(['code','type','label','active'])"
+      }
+    },
+
+    "agents": {
+      ".read": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin'",
+      ".write": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin'",
+      "$agentCode": {
+        ".validate": "$agentCode.matches(/^[A-Z0-9]{4}$/) && newData.hasChildren(['code','name','commissionRate','active']) && newData.child('commissionRate').isNumber() && newData.child('commissionRate').val() >= 0 && newData.child('commissionRate').val() <= 100"
+      }
+    },
+
+    "agent-codes": {
+      ".read": true,
+      ".write": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'admin'",
+      "$agentCode": {
+        ".validate": "$agentCode.matches(/^[A-Z0-9]{4}$/) && newData.hasChildren(['name','active'])"
+      }
+    }
+
+  }
+}

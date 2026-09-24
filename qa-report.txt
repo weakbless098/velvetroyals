@@ -1,0 +1,151 @@
+# Velvet Royals Full QA Report
+Date: 2026-06-30T13:20:49.571Z
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  1. HOMEPAGE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✅ PASS  Nav: HOME
+  ✅ PASS  Nav: PRODUCTS
+  ✅ PASS  Nav: ABOUT
+  ✅ PASS  Nav: CONTACT
+  ✅ PASS  Nav: WISHLIST
+  ✅ PASS  Nav: CART
+  ✅ PASS  Ticker above hero — ✦ Blooming Soon in UAE
+            ·
+            ✦
+  ✅ PASS  Hero carousel present
+  ✅ PASS  Featured products loaded — 8 cards
+  ✅ PASS  Featured count ≤ 8 — 8
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  2. ABOUT PAGE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✅ PASS  About: hero banner image below nav
+  ✅ PASS  About: hero section present
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  3. CONTACT PAGE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✅ PASS  Contact email: velvetroyalsflower@gmail.com
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  4. SHIPPING PAGE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✅ PASS  Shipping: Dubai = AED 25
+  ✅ PASS  Shipping: Sharjah = AED 30
+  ✅ PASS  Shipping: Ajman = AED 30
+  ✅ PASS  Shipping: Umm Al Quwain = AED 50
+  ✅ PASS  Shipping: Ras Al Khaimah = AED 50
+  ✅ PASS  Shipping: Abu Dhabi = AED 150
+  ✅ PASS  Shipping: Al Ain = AED 150
+  ✅ PASS  Shipping: Fujairah = AED 150
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  5. PRIVACY PAGE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✅ PASS  Privacy email: velvetroyalsflower@gmail.com
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  6. PRODUCTS PAGE — Filtering
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✅ PASS  Products loaded — 72 products
+  ✅ PASS  Category filter buttons — 5 buttons
+  ✅ PASS  Filter: Flower — 22 products
+  ✅ PASS  Multi-select: Flower + Arrangement — 70 products
+  ✅ PASS  Search "rose" — 56 results
+  ✅ PASS  BUNDLE badge visible
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  7. PRODUCT DETAIL PAGE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✅ PASS  Product detail page opens
+  ✅ PASS  Product title visible
+  ✅ PASS  Add to Cart button on detail page
+  ⚠️  WARN  Wishlist button not found
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  8. ADD TO CART
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✅ PASS  Product 1 added — cart: 1
+  ✅ PASS  Product 2 added — cart: 2
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  9. CART PAGE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✅ PASS  Cart items visible — 7 items
+  ✅ PASS  Cart width ≤ 1100px — 1100px
+  ✅ PASS  Order summary visible
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  10. DELIVERY AREA FEES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✅ PASS  Fee: Dubai = AED 25
+  ✅ PASS  Fee: Sharjah = AED 30
+  ✅ PASS  Fee: Ajman = AED 30
+  ✅ PASS  Fee: Umm Al Quwain = AED 50
+  ✅ PASS  Fee: Ras Al Khaimah = AED 50
+  ✅ PASS  Fee: Abu Dhabi = AED 150
+  ✅ PASS  Fee: Al Ain = AED 150
+  ✅ PASS  Fee: Fujairah = AED 150
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  11. PICKUP vs DELIVERY TOGGLE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✅ PASS  Pickup: delivery fields hidden
+  ✅ PASS  Delivery: delivery fields visible
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  12. DATE PICKER
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✅ PASS  Date input present — min="2026-07-01"
+  ✅ PASS  Date min = tomorrow (after 2PM cutoff)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  13. COUPON CODES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✅ PASS  Coupon VELVET10 — "Coupon applied: 10% off"
+  ✅ PASS  Coupon VELVET20 — "Coupon applied: 20% off"
+  ✅ PASS  Coupon WELCOME — "Coupon applied: AED 15 off"
+  ✅ PASS  Coupon FREESHIP — "Coupon applied: Free delivery"
+  ✅ PASS  Invalid coupon rejected — "Invalid or expired coupon code."
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  14. CHECKOUT FORM
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✅ PASS  Form field: Name
+  ✅ PASS  Form field: Phone
+  ✅ PASS  Form field: Address
+  ✅ PASS  Form field: Notes
+  ✅ PASS  Date set — 2026-07-01
+  ✅ PASS  Time slot selected
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  15. STRIPE PAYMENT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✅ PASS  Checkout submit button found
+  ✅ PASS  Stripe payment modal appeared
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  16. WISHLIST PAGE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ⚠️  WARN  Wishlist title unexpected — Velvet RoyalsFlowers · Gifts
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  17. MOBILE VIEW (375px)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ✅ PASS  Mobile: hamburger menu present
+  ✅ PASS  Cart fits mobile — 375px
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  SUMMARY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+══════════════════════════════════════════
+  Total checks : 65
+  ✅ Passed    : 63
+  ❌ Failed    : 0
+  ⚠️  Warnings  : 2
+  Screenshots  : test-screenshots
+
+══════════════════════════════════════════

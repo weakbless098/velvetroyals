@@ -1,0 +1,38 @@
+{
+  "name": "flowershop-website",
+  "version": "1.0.0",
+  "description": "A simple flower shop website with a basic CRUD system and responsive UI.",
+  "main": "src/js/app.js",
+  "scripts": {
+    "start": "live-server src",
+    "seed": "node scripts/seed.js",
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:report": "playwright show-report test-report"
+  },
+  "keywords": [
+    "flower",
+    "shop",
+    "ecommerce",
+    "crud",
+    "responsive"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "live-server": "^1.2.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.61.0",
+    "minimist": "^1.2.8",
+    "qrcode": "^1.5.4"
+  },
+  "homepage": "https://your-flower-shop-website.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yourusername/flowershop-website.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/flowershop-website/issues"
+  }
+}

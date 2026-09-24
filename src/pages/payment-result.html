@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex">
+    <title>Payment Status | Velvet Royals Flowershop</title>
+    <link rel="icon" type="image/png" href="../images/favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --gold:       #C8A43A;
+            --gold-dark:  #A87010;
+            --cream:      #F5EDE0;
+            --dark:       #2C1A05;
+            --text-muted: #6B5240;
+            --border:     #E0C8A0;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1A1005 0%, #3D2E10 40%, #2A1E08 100%);
+            padding: 20px;
+        }
+        .card {
+            background: #fff;
+            border-radius: 18px;
+            max-width: 440px;
+            width: 100%;
+            padding: 42px 36px 36px;
+            text-align: center;
+            box-shadow: 0 24px 64px rgba(0, 0, 0, 0.35);
+        }
+        .brand {
+            font-size: 0.7em;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--gold-dark);
+            margin-bottom: 22px;
+        }
+        .status-icon {
+            width: 74px;
+            height: 74px;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+        }
+        .status-icon.spin {
+            border: 4px solid var(--cream);
+            border-top-color: var(--gold);
+            animation: spin 0.9s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .status-icon.ok   { background: #e8f6ec; color: #27ae60; }
+        .status-icon.wait { background: var(--cream); color: var(--gold-dark); font-size: 1.6em; }
+        .status-icon.fail { background: #fbeaea; color: #c0392b; }
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5em;
+            color: var(--dark);
+            margin-bottom: 10px;
+        }
+        p { color: var(--text-muted); line-height: 1.7; font-size: 0.94em; }
+        .order-id {
+            display: inline-block;
+            background: var(--cream);
+            border: 1px dashed var(--border);
+            border-radius: 8px;
+            padding: 8px 14px;
+            font-family: monospace;
+            font-size: 0.88em;
+            color: var(--dark);
+            margin: 16px 0 4px;
+            word-break: break-all;
+        }
+        .btn {
+            display: inline-block;
+            margin-top: 22px;
+            background: #6B4E11;
+            color: #fff;
+            text-decoration: none;
+            font-size: 0.8em;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            padding: 13px 26px;
+            border-radius: 10px;
+        }
+        .btn:hover { background: #8B6508; }
+        .btn.secondary {
+            background: none;
+            color: var(--gold-dark);
+            border: 1px solid var(--border);
+            margin-left: 8px;
+        }
+        .note { font-size: 0.8em; margin-top: 18px; color: #9c8468; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="brand">Velvet Royals Flowershop</div>
+        <div id="icon" class="status-icon spin"></div>
+        <h1 id="title">Checking your payment&hellip;</h1>
+        <p id="message">One moment while we confirm your payment with the bank.</p>
+        <div id="order-id" class="order-id" style="display:none;"></div>
+        <div id="actions" style="display:none;">
+            <a class="btn" id="btn-track" href="orders.html">Track My Order</a>
+            <a class="btn" id="btn-cart" href="cart.html" style="display:none;">Return to Cart</a>
+            <a class="btn secondary" href="../index.html">Back to Shop</a>
+        </div>
+        <p class="note" id="note" style="display:none;"></p>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="../js/tracking-id.js?v=20260811b"></script>
+    <script src="../js/firebase-config.js"></script>
+    <script>
+    (function () {
+        var params = new URLSearchParams(window.location.search);
+        var orderId = (params.get('order') || '').trim();
+
+        var icon = document.getElementById('icon');
+        var title = document.getElementById('title');
+        var message = document.getElementById('message');
+        var orderIdEl = document.getElementById('order-id');
+        var actions = document.getElementById('actions');
+        var note = document.getElementById('note');
+        var btnTrack = document.getElementById('btn-track');
+        var btnCart = document.getElementById('btn-cart');
+
+        var showOrderId = function () {
+            if (!orderId) return;
+            orderIdEl.style.display = 'inline-block';
+            orderIdEl.textContent = 'Tracking ID: ' + rvTrackingId(orderId);
+        };
+
+        // Empty the cart once payment succeeds (kept intact until now so a
+        // cancel returns the customer to a full cart).
+        var clearCart = function () {
+            try { localStorage.removeItem('flowershop_cart'); } catch (e) {}
+        };
+
+        // Remove the pending order so a cancelled/abandoned checkout never
+        // reaches the admin. Server-side guard refuses to delete a paid order.
+        var removedOnce = false;
+        var removeUnpaidOrder = function () {
+            if (removedOnce || !orderId) return Promise.resolve();
+            removedOnce = true;
+            return fetch('https://us-central1-flowershop-d26f4.cloudfunctions.net/cancelUnpaidOrder', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ orderId: orderId })
+            }).catch(function () {});
+        };
+
+        var showPaid = function () {
+            clearCart();
+            icon.className = 'status-icon ok';
+            icon.textContent = '✓';
+            title.textContent = 'Payment Received!';
+            message.innerHTML = 'Thank you &mdash; your order is confirmed and our florists will begin preparing it. A confirmation has been sent to your email.';
+            showOrderId();
+            btnTrack.style.display = 'inline-block';
+            btnCart.style.display = 'none';
+            actions.style.display = 'block';
+            note.style.display = 'none';
+        };
+
+        // Customer backed out on the payment page. Nothing was attempted, so
+        // the pending order is removed and the cart kept for another go.
+        var showCancelled = function () {
+            removeUnpaidOrder();
+            icon.className = 'status-icon fail';
+            icon.textContent = '✕';
+            title.textContent = 'Payment Not Completed';
+            message.innerHTML = 'No worries — your card was <strong>not charged</strong>. Your cart is saved, so you can head back and try again whenever you’re ready.';
+            orderIdEl.style.display = 'none';
+            btnTrack.style.display = 'none';
+            btnCart.style.display = 'inline-block';
+            actions.style.display = 'block';
+            note.style.display = 'none';
+        };
+
+        // The bank refused the card. Unlike a cancellation this order is KEPT
+        // (the shop is alerted and can follow up), so we never call
+        // removeUnpaidOrder here.
+        var showDeclined = function () {
+            icon.className = 'status-icon fail';
+            icon.textContent = '✕';
+            title.textContent = 'Payment Declined';
+            message.innerHTML = 'Your bank didn’t approve this card, so the payment couldn’t be completed — <strong>nothing was charged</strong>. Your order is saved. Try again with a different card, or make sure you approve the confirmation your bank sends.';
+            showOrderId();
+            btnTrack.style.display = 'none';
+            btnCart.style.display = 'inline-block';
+            actions.style.display = 'block';
+            note.style.display = 'block';
+            note.innerHTML = 'Still stuck? <a href="https://api.whatsapp.com/send?phone=971507443100&text=Hi%20Velvet%20Royals!%20My%20payment%20was%20declined%20-%20can%20you%20help%3F" style="color:#a87010;">Message us on WhatsApp</a> and we’ll send you a fresh payment link.';
+        };
+
+        var showPending = function () {
+            icon.className = 'status-icon wait';
+            icon.textContent = '⏳';
+            title.textContent = 'Payment Processing';
+            message.innerHTML = 'Your payment is being finalized. This page updates automatically the moment it clears &mdash; you can also safely close it.';
+            showOrderId();
+            btnTrack.style.display = 'inline-block';
+            btnCart.style.display = 'inline-block';
+            actions.style.display = 'block';
+            note.style.display = 'block';
+            note.textContent = 'If you cancelled, nothing was charged — just head back to your cart to try again.';
+        };
+
+        // The "Return to Cart" button also removes the pending order on the way
+        // out, in case the customer clicks it before the status settles.
+        if (btnCart) {
+            btnCart.addEventListener('click', function (e) {
+                e.preventDefault();
+                removeUnpaidOrder().then(function () { window.location.href = 'cart.html'; });
+                setTimeout(function () { window.location.href = 'cart.html'; }, 1200);
+            });
+        }
+
+        // Geidea appends its result to the return URL. responseCode 000 =
+        // success; anything else means the payment did not complete.
+        //
+        // Two very different cases hide behind "did not complete":
+        //   • 073 / "Cancelled by User" — they backed out, nothing attempted.
+        //     No webhook fires, so clean the pending order up here.
+        //   • anything else — the bank DECLINED a real attempt. Keep the order
+        //     (the shop gets alerted and can follow up to recover the sale).
+        var responseCode = (params.get('responseCode') || '').trim();
+        var responseMessage = (params.get('responseMessage') || '').trim();
+        var isUserCancel = responseCode === '073' || /cancel/i.test(responseMessage);
+
+        if (responseCode && responseCode !== '000') {
+            if (isUserCancel) { showCancelled(); } else { showDeclined(); }
+            return;
+        }
+
+        if (!orderId || typeof firebase === 'undefined') {
+            showPending();
+            return;
+        }
+
+        var ref = firebase.database().ref('order-tracking/' + orderId);
+        var settled = false;
+
+        // Live-listen: the webhook flips paymentStatus to 'paid'; the page
+        // reacts in real time. A cancelled/failed payment shows the "not
+        // completed" state and cleans up the pending order.
+        ref.on('value', function (snap) {
+            var t = snap.val();
+            if (!t) return;
+            if (t.paymentStatus === 'paid' || t.status === 'confirmed') {
+                settled = true;
+                showPaid();
+            } else if (t.paymentStatus === 'failed') {
+                // Only the webhook writes 'failed', and it only fires for a
+                // real attempt the bank refused — so this is always a decline.
+                settled = true;
+                showDeclined();
+            }
+        }, function () { showPending(); });
+
+        setTimeout(function () { if (!settled) showPending(); }, 25000);
+    })();
+    </script>
+</body>
+</html>

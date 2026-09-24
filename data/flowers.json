@@ -1,0 +1,37 @@
+[
+    {
+        "id": 1,
+        "name": "Rose",
+        "price": 10.99,
+        "description": "A beautiful red rose, perfect for any occasion. Symbolizes love and passion.",
+        "image": "https://images.unsplash.com/photo-1518895949257-7621c3c786d7?w=400&h=400&fit=crop"
+    },
+    {
+        "id": 2,
+        "name": "Tulip",
+        "price": 8.99,
+        "description": "A vibrant tulip that adds color to your garden. Represents elegance and grace.",
+        "image": "https://images.unsplash.com/photo-1551074313-802101ec6b24?w=400&h=400&fit=crop"
+    },
+    {
+        "id": 3,
+        "name": "Sunflower",
+        "price": 12.99,
+        "description": "A cheerful sunflower that brightens up any space. Brings happiness and warmth.",
+        "image": "https://images.unsplash.com/photo-1597848848267-d4ef3798ecc2?w=400&h=400&fit=crop"
+    },
+    {
+        "id": 4,
+        "name": "Lily",
+        "price": 15.99,
+        "description": "Elegant lilies that symbolize purity and refined beauty. Perfect for special moments.",
+        "image": "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=400&fit=crop"
+    },
+    {
+        "id": 5,
+        "name": "Daisy",
+        "price": 7.99,
+        "description": "A simple yet charming daisy, perfect for a casual bouquet. Symbolizes innocence.",
+        "image": "https://images.unsplash.com/photo-1490281994029-57e145eda9f7?w=400&h=400&fit=crop"
+    }
+]

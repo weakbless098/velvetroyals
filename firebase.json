@@ -1,0 +1,67 @@
+{
+  "database": {
+    "rules": "database.rules.json"
+  },
+  "storage": {
+    "rules": "storage.rules"
+  },
+  "functions": {
+    "source": "functions"
+  },
+  "hosting": {
+    "public": "src",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**",
+      "oracleJdk-26/**",
+      "**/*.exe",
+      "**/*.dll",
+      "**/*.msi",
+      "**/*.bin",
+      "**/*.so",
+      "seed.html"
+    ],
+    "headers": [
+      {
+        "source": "**/*.html",
+        "headers": [
+          { "key": "Cache-Control", "value": "no-cache, must-revalidate" },
+          { "key": "X-Content-Type-Options", "value": "nosniff" },
+          { "key": "X-Frame-Options", "value": "SAMEORIGIN" },
+          { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+          { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" },
+          { "key": "X-XSS-Protection", "value": "1; mode=block" }
+        ]
+      },
+      {
+        "source": "**/*.@(js|css)",
+        "headers": [
+          { "key": "Cache-Control", "value": "public, max-age=86400" }
+        ]
+      },
+      {
+        "source": "**/*.@(jpg|jpeg|png|gif|webp|svg|ico)",
+        "headers": [
+          { "key": "Cache-Control", "value": "public, max-age=604800" }
+        ]
+      },
+      {
+        "source": "**",
+        "headers": [
+          { "key": "X-Content-Type-Options", "value": "nosniff" },
+          { "key": "X-Frame-Options", "value": "SAMEORIGIN" },
+          { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+          { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" },
+          { "key": "X-XSS-Protection", "value": "1; mode=block" }
+        ]
+      }
+    ],
+    "rewrites": [
+      {
+        "source": "/__/auth/action",
+        "destination": "/pages/auth-action.html"
+      }
+    ]
+  }
+}

@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Reset your password | Velvet Royals Flowershop Artisan Floral Studio.">
+    <title>Reset Password | Velvet Royals Flowershop</title>
+    <link rel="icon" type="image/png" href="../images/favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --gold:        #C8A43A;
+            --gold-light:  #D4B84A;
+            --gold-dark:   #A87010;
+            --cream:       #F5EDE0;
+            --cream-warm:  #EDD9B8;
+            --dark:        #2C1A05;
+            --dark-mid:    #3D2E10;
+            --text:        #2C1A05;
+            --text-muted:  #6B5240;
+            --white:       #ffffff;
+            --border:      #E0C8A0;
+            --radius:      12px;
+            --transition:  0.25s ease;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1A1005 0%, #3D2E10 40%, #2A1E08 100%);
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Background decorative elements */
+        body::before {
+            content: '';
+            position: absolute;
+            top: -30%;
+            left: -20%;
+            width: 80%;
+            height: 80%;
+            background: radial-gradient(ellipse, rgba(182,141,64,0.08) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        body::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            right: -20%;
+            width: 80%;
+            height: 80%;
+            background: radial-gradient(ellipse, rgba(182,141,64,0.06) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        /* ===== Auth Card ===== */
+        .auth-card {
+            background: var(--white);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 480px;
+            box-shadow: 0 32px 80px rgba(0,0,0,0.35);
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+            animation: cardEntry 0.5s ease-out;
+        }
+
+        @keyframes cardEntry {
+            from { opacity: 0; transform: translateY(16px) scale(0.97); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* ===== Brand Header ===== */
+        .auth-brand {
+            background: var(--cream);
+            border-bottom: 1px solid var(--border);
+            padding: 32px 40px 28px;
+            text-align: center;
+            position: relative;
+        }
+
+        .auth-brand::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 60px; height: 2px;
+            background: var(--gold);
+            border-radius: 2px;
+        }
+
+        .auth-brand-logo {
+            width: auto;
+            height: 112px;
+            object-fit: contain;
+            margin-bottom: 8px;
+        }
+
+        .auth-brand-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6em;
+            font-weight: 700;
+            color: var(--text);
+            letter-spacing: 1px;
+        }
+
+        .auth-brand-tagline {
+            font-size: 0.72em;
+            color: var(--gold-dark);
+            font-weight: 600;
+            margin-top: 4px;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+        }
+
+        /* ===== Icon Header ===== */
+        .reset-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 56px;
+            height: 56px;
+            margin: 0 auto 16px;
+            background: rgba(182,141,64,0.12);
+            border-radius: 50%;
+            color: var(--gold);
+        }
+
+        .reset-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4em;
+            font-weight: 600;
+            color: var(--text);
+            text-align: center;
+            margin-bottom: 6px;
+        }
+
+        .reset-subtitle {
+            font-size: 0.88em;
+            color: var(--text-muted);
+            text-align: center;
+            margin-bottom: 24px;
+            font-weight: 300;
+        }
+
+        .reset-email {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        /* ===== Form Body ===== */
+        .auth-body {
+            padding: 32px 32px 36px;
+        }
+
+        /* ===== Messages ===== */
+        .auth-message {
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 0.88em;
+            margin-bottom: 18px;
+            display: none;
+            animation: fadeSlide 0.2s ease;
+        }
+
+        @keyframes fadeSlide {
+            from { opacity: 0; transform: translateY(-4px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .auth-message.error {
+            background: #fef2f2;
+            color: #c0392b;
+            border: 1px solid #f5c6c6;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .auth-message.success {
+            background: #f0faf0;
+            color: #27ae60;
+            border: 1px solid #a9dfbf;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .auth-message.info {
+            background: #f0f4ff;
+            color: #3b5998;
+            border: 1px solid #c3d4f7;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* ===== Form Group ===== */
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.82em;
+            font-weight: 500;
+            color: var(--text);
+            margin-bottom: 6px;
+            letter-spacing: 0.3px;
+        }
+
+        .input-wrap {
+            position: relative;
+        }
+
+        .input-wrap input {
+            width: 100%;
+            padding: 13px 44px 13px 16px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.92em;
+            color: var(--text);
+            background: var(--cream);
+            transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
+            outline: none;
+        }
+
+        .input-wrap input:focus {
+            border-color: var(--gold);
+            background: var(--white);
+            box-shadow: 0 0 0 3px rgba(182,141,64,0.12);
+        }
+
+        .input-wrap input.input-error {
+            border-color: #e74c3c;
+            box-shadow: 0 0 0 3px rgba(231,76,60,0.1);
+        }
+
+        .input-wrap input.input-success {
+            border-color: #27ae60;
+            box-shadow: 0 0 0 3px rgba(39,174,96,0.1);
+        }
+
+        /* Toggle visibility button */
+        .toggle-pw {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-muted);
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s ease;
+        }
+
+        .toggle-pw:hover {
+            color: var(--gold);
+        }
+
+        /* ===== Password Strength ===== */
+        .strength-bar {
+            height: 4px;
+            border-radius: 4px;
+            background: var(--border);
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        .strength-fill {
+            height: 100%;
+            border-radius: 4px;
+            width: 0;
+            transition: width 0.35s ease, background 0.35s ease;
+        }
+
+        .strength-fill.weak { width: 33%; background: #e74c3c; }
+        .strength-fill.medium { width: 66%; background: var(--gold); }
+        .strength-fill.strong { width: 100%; background: #27ae60; }
+
+        .strength-label {
+            font-size: 0.73em;
+            font-weight: 500;
+            margin-top: 4px;
+        }
+
+        .strength-label.weak { color: #e74c3c; }
+        .strength-label.medium { color: var(--gold); }
+        .strength-label.strong { color: #27ae60; }
+
+        /* Requirements */
+        .requirements {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4px 14px;
+            margin-top: 10px;
+        }
+
+        .req-item {
+            font-size: 0.76em;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: color 0.2s ease;
+        }
+
+        .req-icon {
+            display: inline-flex;
+            width: 15px;
+            height: 15px;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            flex-shrink: 0;
+            transition: all 0.2s ease;
+            background: var(--border);
+        }
+
+        .req-item.met {
+            color: #27ae60;
+        }
+
+        .req-item.met .req-icon {
+            background: #27ae60;
+            color: var(--white);
+        }
+
+        /* Confirm hint */
+        .confirm-hint {
+            font-size: 0.78em;
+            margin-top: 5px;
+            transition: color 0.2s ease;
+        }
+
+        .confirm-hint.error { color: #e74c3c; }
+        .confirm-hint.success { color: #27ae60; }
+
+        /* ===== Primary Button ===== */
+        .btn-primary {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+            color: var(--dark);
+            border: none;
+            border-radius: 10px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95em;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 8px;
+            transition: background var(--transition), box-shadow var(--transition), transform 0.15s;
+            letter-spacing: 0.3px;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold) 100%);
+            box-shadow: 0 4px 18px rgba(200,164,58,0.35);
+        }
+
+        .btn-primary:active { transform: scale(0.98); }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* ===== Back Link ===== */
+        .auth-back {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.84em;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color var(--transition);
+        }
+
+        .auth-back:hover { color: var(--gold); }
+
+        /* ===== Success State ===== */
+        .success-container {
+            text-align: center;
+            padding: 12px 0;
+        }
+
+        .success-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 64px;
+            height: 64px;
+            background: #e8f8e8;
+            border-radius: 50%;
+            color: #27ae60;
+            margin-bottom: 18px;
+            animation: successPop 0.4s ease-out;
+        }
+
+        @keyframes successPop {
+            0% { transform: scale(0); opacity: 0; }
+            60% { transform: scale(1.15); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .success-container h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3em;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+
+        .success-container p {
+            font-size: 0.9em;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+
+        .btn-success {
+            display: inline-block;
+            padding: 13px 32px;
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+            color: var(--dark);
+            border: none;
+            border-radius: 10px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.92em;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background var(--transition), box-shadow var(--transition);
+        }
+
+        .btn-success:hover {
+            background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold) 100%);
+            box-shadow: 0 4px 16px rgba(200,164,58,0.35);
+        }
+
+        /* ===== Loading Spinner ===== */
+        .loading-container {
+            text-align: center;
+            padding: 24px 0;
+        }
+
+        .spinner {
+            width: 36px;
+            height: 36px;
+            border: 3px solid var(--border);
+            border-top-color: var(--gold);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            margin: 0 auto 14px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-container p {
+            font-size: 0.88em;
+            color: var(--text-muted);
+            font-weight: 300;
+        }
+
+        /* ===== Hidden ===== */
+        .hidden { display: none !important; }
+
+        /* ===== Mobile ===== */
+        @media (max-width: 480px) {
+            .auth-brand {
+                padding: 28px 24px 22px;
+            }
+            .auth-brand-name {
+                font-size: 1.6em;
+            }
+            .auth-body {
+                padding: 24px 20px 28px;
+            }
+            .requirements {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-card">
+        <div class="auth-brand">
+            <img src="../images/logo-auth.png" alt="Velvet Royals Flowershop Logo" class="auth-brand-logo">
+            <div class="auth-brand-name">Velvet Royals Flowershop</div>
+            <div class="auth-brand-tagline">Artisan Floral Studio</div>
+        </div>
+
+        <div class="auth-body">
+            <div id="loading-state">
+                <div class="loading-container">
+                    <div class="spinner"></div>
+                    <p>Verifying your reset link...</p>
+                </div>
+            </div>
+
+            <div id="reset-form-state" class="hidden">
+                <div class="reset-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                </div>
+                <h2 class="reset-title">Reset Your Password</h2>
+                <p class="reset-subtitle">for <span id="user-email" class="reset-email">—</span></p>
+
+                <div id="reset-message" class="auth-message"></div>
+
+                <form id="reset-form" onsubmit="handleResetPassword(event)">
+                    <div class="form-group">
+                        <label for="new-password">New Password</label>
+                        <div class="input-wrap">
+                            <input type="password" id="new-password" placeholder="Enter new password" required autocomplete="new-password" oninput="validatePassword()">
+                            <button type="button" class="toggle-pw" onclick="toggleVisibility('new-password', this)">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+                            </button>
+                        </div>
+                        <div class="strength-bar"><div id="strength-fill" class="strength-fill"></div></div>
+                        <div id="strength-label" class="strength-label"></div>
+                        <div class="requirements">
+                            <div class="req-item" id="req-length"><span class="req-icon"></span> 6+ characters</div>
+                            <div class="req-item" id="req-upper"><span class="req-icon"></span> Uppercase</div>
+                            <div class="req-item" id="req-lower"><span class="req-icon"></span> Lowercase</div>
+                            <div class="req-item" id="req-number"><span class="req-icon"></span> Number</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirm-password">Confirm New Password</label>
+                        <div class="input-wrap">
+                            <input type="password" id="confirm-password" placeholder="Re-enter new password" required autocomplete="new-password" oninput="validateConfirm()">
+                            <button type="button" class="toggle-pw" onclick="toggleVisibility('confirm-password', this)">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>
+                            </button>
+                        </div>
+                        <div id="confirm-hint" class="confirm-hint"></div>
+                    </div>
+
+                    <button type="submit" class="btn-primary" id="submit-btn">Save New Password</button>
+                </form>
+
+                <a href="login.html" class="auth-back">← Back to Sign In</a>
+            </div>
+
+            <div id="success-state" class="hidden">
+                <div class="success-container">
+                    <div class="success-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    </div>
+                    <h3>Password Updated!</h3>
+                    <p>Your password has been successfully reset. You can now sign in with your new password.</p>
+                    <a href="login.html" class="btn-success">Sign In Now</a>
+                </div>
+            </div>
+
+            <div id="error-state" class="hidden">
+                <div class="reset-icon" style="background:rgba(231,76,60,0.1); color:#e74c3c;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+                </div>
+                <h2 class="reset-title">Link Expired</h2>
+                <p class="reset-subtitle" id="error-description">This password reset link has expired or has already been used.</p>
+                <a href="login.html" class="btn-primary" style="display:block;text-align:center;text-decoration:none;margin-top:16px;">Request a New Link</a>
+                <a href="../index.html" class="auth-back">← Back to Store</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script>
+        // Initialize Firebase (minimal | only auth needed)
+        firebase.initializeApp({
+            apiKey: "AIzaSyB-AOH-ceKkUM-Ndr67_iW04eQ95BMMGi8",
+            authDomain: "flowershop-d26f4.firebaseapp.com",
+            projectId: "flowershop-d26f4"
+        });
+
+        // ===== Parse URL Parameters =====
+        const params = new URLSearchParams(window.location.search);
+        const mode    = params.get('mode');
+        const oobCode = params.get('oobCode');
+
+        // SVG icons
+        const eyeOpenSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
+        const eyeClosedSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>';
+        const checkSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+
+        // ===== Init: Verify the Reset Code =====
+        async function init() {
+            if (mode !== 'resetPassword' || !oobCode) {
+                showState('error');
+                document.getElementById('error-description').textContent =
+                    'Invalid link. This page is for resetting your password via the email link.';
+                return;
+            }
+
+            try {
+                // Verify the code and get the email
+                const email = await firebase.auth().verifyPasswordResetCode(oobCode);
+                document.getElementById('user-email').textContent = email;
+                showState('reset-form');
+                document.getElementById('new-password').focus();
+            } catch (err) {
+                showState('error');
+                if (err.code === 'auth/expired-action-code') {
+                    document.getElementById('error-description').textContent =
+                        'This password reset link has expired. Please request a new one.';
+                } else if (err.code === 'auth/invalid-action-code') {
+                    document.getElementById('error-description').textContent =
+                        'This password reset link has already been used or is invalid.';
+                } else {
+                    document.getElementById('error-description').textContent =
+                        'Unable to verify this reset link. Please request a new one.';
+                }
+            }
+        }
+
+        function showState(state) {
+            document.getElementById('loading-state').classList.add('hidden');
+            document.getElementById('reset-form-state').classList.add('hidden');
+            document.getElementById('success-state').classList.add('hidden');
+            document.getElementById('error-state').classList.add('hidden');
+            document.getElementById(state + '-state').classList.remove('hidden');
+        }
+
+        // ===== Toggle Password Visibility =====
+        function toggleVisibility(inputId, btn) {
+            const input = document.getElementById(inputId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                btn.innerHTML = eyeOpenSvg;
+            } else {
+                input.type = 'password';
+                btn.innerHTML = eyeClosedSvg;
+            }
+        }
+
+        // ===== Password Strength =====
+        function getStrength(pw) {
+            let score = 0;
+            if (pw.length >= 6) score++;
+            if (pw.length >= 10) score++;
+            if (/[A-Z]/.test(pw)) score++;
+            if (/[a-z]/.test(pw)) score++;
+            if (/[0-9]/.test(pw)) score++;
+            if (/[^A-Za-z0-9]/.test(pw)) score++;
+            if (score <= 2) return 'weak';
+            if (score <= 4) return 'medium';
+            return 'strong';
+        }
+
+        function validatePassword() {
+            const pw = document.getElementById('new-password').value;
+            const fill = document.getElementById('strength-fill');
+            const label = document.getElementById('strength-label');
+
+            if (pw.length === 0) {
+                fill.className = 'strength-fill';
+                label.className = 'strength-label';
+                label.textContent = '';
+            } else {
+                const s = getStrength(pw);
+                fill.className = 'strength-fill ' + s;
+                label.className = 'strength-label ' + s;
+                const map = { weak: 'Weak password', medium: 'Good password', strong: 'Strong password' };
+                label.textContent = map[s];
+            }
+
+            // Update requirement checklist
+            const checks = {
+                'req-length': pw.length >= 6,
+                'req-upper': /[A-Z]/.test(pw),
+                'req-lower': /[a-z]/.test(pw),
+                'req-number': /[0-9]/.test(pw)
+            };
+            Object.keys(checks).forEach(id => {
+                const el = document.getElementById(id);
+                const icon = el.querySelector('.req-icon');
+                if (checks[id]) {
+                    el.classList.add('met');
+                    icon.innerHTML = checkSvg;
+                } else {
+                    el.classList.remove('met');
+                    icon.innerHTML = '';
+                }
+            });
+
+            // Also recheck confirm
+            if (document.getElementById('confirm-password').value) validateConfirm();
+        }
+
+        function validateConfirm() {
+            const pw = document.getElementById('new-password').value;
+            const confirm = document.getElementById('confirm-password').value;
+            const hint = document.getElementById('confirm-hint');
+            const input = document.getElementById('confirm-password');
+
+            if (!confirm) {
+                hint.className = 'confirm-hint';
+                hint.textContent = '';
+                input.className = '';
+                return;
+            }
+
+            if (pw === confirm) {
+                hint.className = 'confirm-hint success';
+                hint.textContent = '✓ Passwords match';
+                input.className = 'input-success';
+            } else {
+                hint.className = 'confirm-hint error';
+                hint.textContent = 'Passwords do not match';
+                input.className = 'input-error';
+            }
+        }
+
+        // ===== Handle Reset Submit =====
+        async function handleResetPassword(e) {
+            e.preventDefault();
+
+            const newPw = document.getElementById('new-password').value;
+            const confirmPw = document.getElementById('confirm-password').value;
+            const btn = document.getElementById('submit-btn');
+            const msg = document.getElementById('reset-message');
+
+            msg.className = 'auth-message';
+            msg.textContent = '';
+
+            // Validate
+            if (newPw.length < 6) {
+                showMsg('New password must be at least 6 characters.', 'error');
+                return;
+            }
+            if (!/[A-Z]/.test(newPw)) {
+                showMsg('Password must contain at least one uppercase letter.', 'error');
+                return;
+            }
+            if (!/[a-z]/.test(newPw)) {
+                showMsg('Password must contain at least one lowercase letter.', 'error');
+                return;
+            }
+            if (!/[0-9]/.test(newPw)) {
+                showMsg('Password must contain at least one number.', 'error');
+                return;
+            }
+            if (newPw !== confirmPw) {
+                showMsg('Passwords do not match.', 'error');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = 'Saving...';
+
+            try {
+                await firebase.auth().confirmPasswordReset(oobCode, newPw);
+                showState('success');
+            } catch (err) {
+                const map = {
+                    'auth/expired-action-code': 'This reset link has expired. Please request a new one.',
+                    'auth/invalid-action-code': 'This reset link is invalid or has already been used.',
+                    'auth/weak-password': 'Password is too weak. Please use a stronger password.',
+                    'auth/too-many-requests': 'Too many attempts. Please try again later.'
+                };
+                showMsg(map[err.code] || 'Failed to reset password. Please try again.', 'error');
+                btn.disabled = false;
+                btn.textContent = 'Save New Password';
+            }
+        }
+
+        function showMsg(text, type) {
+            const msg = document.getElementById('reset-message');
+            msg.className = 'auth-message ' + type;
+            msg.textContent = text;
+        }
+
+        // Start
+        init();
+    </script>
+</body>
+</html>
+

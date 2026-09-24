@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Admin panel for managing flower products in the Velvet Royals Flowershop catalog.">
+    <title>Admin Panel | Velvet Royals Flowershop</title>
+    <link rel="icon" type="image/png" href="../images/favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css?v=20260924c">
+    <link rel="stylesheet" href="../css/responsive.css?v=20260811b">
+</head>
+
+<body>
+    <div id="auth-guard"
+        style="position:fixed;inset:0;background:var(--color-cream,#faf8f5);display:flex;align-items:center;justify-content:center;z-index:9999;">
+        <div style="text-align:center;">
+            <div style="font-family:'Playfair Display',serif;font-size:1.6em;color:#2c3e2d;margin-bottom:8px;">Velvet Royals</div>
+            <div style="font-size:0.85em;color:#6b6b6b;font-weight:300;">Verifying access...</div>
+        </div>
+    </div>
+
+    <header>
+        <div class="header-inner">
+            <h1><a href="../index.html" style="color:inherit;text-decoration:none;"><img src="../images/logo-header.png" alt="Velvet Royals Flowershop Logo" class="header-logo"></a></h1>
+            <button class="nav-burger" id="nav-burger" aria-label="Toggle menu" aria-expanded="false">
+                <span></span><span></span><span></span>
+            </button>
+            <nav id="main-nav">
+                <ul>
+                    <li class="nav-brand-label">Admin Panel <span id="admin-toolbar-name" style="font-weight:400;opacity:0.65;font-size:0.82em;"></span></li>
+                    <li><a href="#dashboard-section" class="orders-nav-link">Dashboard</a></li>
+                    <li><a href="#inventory-section" class="orders-nav-link">Inventory</a></li>
+                    <li>
+                        <a href="#orders-section" id="orders-nav-link" class="orders-nav-link">
+                            Orders
+                            <span id="orders-badge" class="orders-badge" style="display:none;">0</span>
+                        </a>
+                    </li>
+                    <li><a href="#calendar-section" class="orders-nav-link">Calendar</a></li>
+                    <li><a href="#agents-section" class="orders-nav-link">Agents</a></li>
+                    <li><a href="#coupons-section" class="orders-nav-link">Coupons</a></li>
+                    <li>
+                        <a href="#messages-section" class="orders-nav-link">
+                            Messages
+                            <span id="messages-badge" class="orders-badge" style="display:none;">0</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#reviews-admin-section" class="orders-nav-link">
+                            Reviews
+                            <span id="reviews-badge" class="orders-badge" style="display:none;">0</span>
+                        </a>
+                    </li>
+                    <li>
+                        <button onclick="authModule.enterPreviewMode()" class="btn-preview-store">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                            Preview Store
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="authModule.openChangePassword()" class="btn-black-logout" title="Change your admin password">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                            Change Password
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="authModule.logout()" class="btn-black-logout">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                            Sign Out
+                        </button>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+        <div class="nav-overlay" id="nav-overlay"></div>
+    </header>
+    <main id="admin-main">
+
+        <section id="dashboard-section" class="admin-section">
+            <div class="section-header">
+                <h2>Dashboard</h2>
+                <p class="section-subtitle">Live snapshot of your shop's activity</p>
+            </div>
+            <div class="admin-stats-grid">
+                <div class="stat-tile stat-today">
+                    <div class="stat-tile-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                    </div>
+                    <div class="stat-tile-value" id="stat-today-orders">—</div>
+                    <div class="stat-tile-label">Today's Orders</div>
+                </div>
+                <div class="stat-tile stat-pending">
+                    <div class="stat-tile-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    </div>
+                    <div class="stat-tile-value" id="stat-pending-orders">—</div>
+                    <div class="stat-tile-label">Pending Orders</div>
+                </div>
+                <div class="stat-tile stat-revenue">
+                    <div class="stat-tile-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                    </div>
+                    <div class="stat-tile-value" id="stat-monthly-revenue">—</div>
+                    <div class="stat-tile-label">Revenue This Month</div>
+                </div>
+                <div class="stat-tile stat-reviews">
+                    <div class="stat-tile-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                    </div>
+                    <div class="stat-tile-value" id="stat-new-reviews">—</div>
+                    <div class="stat-tile-label">New Reviews (7 days)</div>
+                </div>
+            </div>
+        </section>
+
+        <section id="product-management" class="admin-section">
+            <div class="section-header">
+                <h2>Product Management</h2>
+                <p class="section-subtitle">Add, edit, or remove products from your catalog</p>
+            </div>
+
+            <div class="admin-container">
+                <div class="form-panel" id="form-panel">
+                    <button type="button" id="edit-modal-close" class="edit-modal-close" aria-label="Close" onclick="crud.exitEditMode()">&times;</button>
+                    <h3 id="form-panel-title">Add New Product</h3>
+                    <div id="edit-mode-badge" class="edit-mode-badge" style="display:none;">
+                        <div class="edit-mode-badge-inner">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                            </svg>
+                            Editing existing product
+                        </div>
+                        <div class="edit-preview-wrap" id="edit-preview-wrap" style="display:none;">
+                            <img id="edit-preview-img" src="" alt="" class="edit-preview-img">
+                            <span id="edit-preview-name" class="edit-preview-name"></span>
+                        </div>
+                    </div>
+                    <form id="product-form" class="admin-form">
+                        <div class="form-group">
+                            <label for="product-name">Product Name</label>
+                            <input type="text" id="product-name" placeholder="e.g., Rose, Tulip, Sunflower" required>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="product-price">Original Price (AED)</label>
+                                <input type="number" id="product-price" placeholder="e.g., 150.00" step="0.01" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="product-sale-price">Sale Price (AED) <span style="font-weight:400;font-size:0.82em;color:#aaa;">— optional</span></label>
+                                <input type="number" id="product-sale-price" placeholder="e.g., 120.00 (leave blank = no sale)" step="0.01" min="0">
+                                <div class="discount-chips">
+                                    <button type="button" class="discount-chip" onclick="crud.applyQuickDiscount(20, this)">−20%</button>
+                                    <button type="button" class="discount-chip" onclick="crud.applyQuickDiscount(30, this)">−30%</button>
+                                    <button type="button" class="discount-chip" onclick="crud.applyQuickDiscount(50, this)">−50%</button>
+                                    <button type="button" class="discount-chip discount-chip-clear" onclick="crud.clearQuickDiscount()">No sale</button>
+                                </div>
+                                <p class="sale-price-hint">When set, shows strikethrough original + red sale price on the store.</p>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="product-quantity">Quantity <span style="font-weight:400;font-size:0.82em;color:#aaa;">just type — each number starts a new item</span></label>
+                                <input type="text" id="product-quantity" placeholder="e.g., 2 hydrangea white 5 spray rose 1 vase">
+                                <div id="quantity-preview" class="quantity-preview" style="display:none;"></div>
+                            </div>
+
+                        <div class="form-group">
+                                <label for="product-perfect-for">Perfect For <span style="font-weight:400;font-size:0.82em;color:#aaa;">optional — leave empty for automatic suggestions</span></label>
+                                <textarea id="product-perfect-for" rows="3" placeholder="e.g., Romantic Occasions, Anniversaries, Birthdays, Valentine's Day"></textarea>
+                                <div id="perfect-for-preview" class="quantity-preview" style="display:none;"></div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group" style="grid-column:1/-1;">
+                                <label for="product-category">Category</label>
+                                <select id="product-category" required onchange="(function(v){document.getElementById('arrangement-type-group').style.display=(v==='arrangement'||v==='bundle')?'':'none';})(this.value)">
+                                    <option value="flower">Flowers</option>
+                                    <option value="arrangement">Arrangement</option>
+                                    <option value="chocolates">Chocolates</option>
+                                    <option value="cakes">Cakes and Pastries</option>
+                                    <option value="bundle">Bundle Gift Set</option>
+                                    <option value="gift">Gifts</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group" id="arrangement-type-group" style="display:none;">
+                            <label for="product-arrangement-type">Arrangement Type</label>
+                            <select id="product-arrangement-type">
+                                <option value="">— Select type —</option>
+                                <optgroup label="Flowers">
+                                    <option value="handbouquet">Hand Bouquet</option>
+                                    <option value="vase">Vase Arrangement</option>
+                                    <option value="box">Box Arrangement</option>
+                                    <option value="hundredroses">Hundred Rose Collection</option>
+                                    <option value="basket">Basket Arrangement</option>
+                                    <option value="bridal">Bridal Bouquet</option>
+                                    <option value="corsage">Corsage</option>
+                                    <option value="corporate">Corporate Arrangement</option>
+                                    <option value="foreverrose">Forever Rose</option>
+                                </optgroup>
+                                <optgroup label="Bundle Gift Set">
+                                    <option value="teddybear">Flowers + Bear</option>
+                                    <option value="bundlechocolate">Flowers + Chocolate</option>
+                                    <option value="bundlecake">Flower + Cake</option>
+                                    <option value="bundleperfume">Flower + Perfume</option>
+                                </optgroup>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="product-description">Description</label>
+                            <textarea id="product-description" placeholder="Write a description of your flower..."
+                                rows="3" required></textarea>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="product-occasion">Occasion</label>
+                                <select id="product-occasion">
+                                    <option value="">All Occasions</option>
+                                    <option value="romantic">Romantic Occasions</option>
+                                    <option value="anniversary">Anniversary</option>
+                                    <option value="birthday">Birthday</option>
+                                    <option value="valentine">Valentine's Day</option>
+                                    <option value="mothersday">Mother's Day</option>
+                                    <option value="fathersday">Father's Day</option>
+                                    <option value="congratulations">Congratulations</option>
+                                    <option value="wedding">Wedding Gifts</option>
+                                    <option value="bridalshower">Bridal Shower</option>
+                                    <option value="babygirl">Baby Girl / Shower</option>
+                                    <option value="babyboy">Baby Boy / Shower</option>
+                                    <option value="babyshower">Baby Shower</option>
+                                    <option value="corporate">Luxury Corporate Gifts</option>
+                                    <option value="sympathy">Sympathy</option>
+                                    <option value="christmas">Christmas Day</option>
+                                    <option value="getwell">Get Well</option>
+                                    <option value="sorry">I'm Sorry</option>
+                                    <option value="graduation">Graduation</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="product-recipient">Best For</label>
+                                <select id="product-recipient">
+                                    <option value="">Everyone</option>
+                                    <option value="her">For Her</option>
+                                    <option value="him">For Him</option>
+                                    <option value="parents">For Parents</option>
+                                    <option value="baby">For Baby</option>
+                                    <option value="friend">For Friend</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="product-badge">Product Badge</label>
+                                <select id="product-badge">
+                                    <option value="">None</option>
+                                    <option value="new">NEW</option>
+                                    <option value="bestseller">BESTSELLER</option>
+                                    <option value="hotpick">HOT PICK</option>
+                                    <option value="sale">SALE</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Availability</label>
+                                <div class="availability-toggle-wrap">
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="product-available" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                    <span id="availability-label" class="avail-label avail-in-stock">In Stock</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Visibility</label>
+                                <div class="availability-toggle-wrap">
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="product-hidden">
+                                        <span class="toggle-slider toggle-slider-danger"></span>
+                                    </label>
+                                    <span id="hidden-label" class="avail-label avail-in-stock">Visible in store</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="product-stock">Stock Quantity <span class="field-hint-inline">optional — leave blank if you don't count this item</span></label>
+                                <input type="number" id="product-stock" min="0" step="1" placeholder="e.g., 12">
+                                <p class="field-hint">Counts down automatically as orders are paid. At 0 the item shows as Sold Out.</p>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Product Image</label>
+
+                            <div class="img-tab-bar">
+                                <button type="button" class="img-tab active" id="img-tab-upload"
+                                    onclick="imgInput.switchTab('upload')">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                                    Upload File
+                                </button>
+                                <button type="button" class="img-tab" id="img-tab-url"
+                                    onclick="imgInput.switchTab('url')">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+                                    Image URL
+                                </button>
+                            </div>
+
+                            <div id="img-panel-upload" class="img-panel">
+                                <div class="img-dropzone" id="img-dropzone"
+                                    onclick="document.getElementById('img-file-input').click()"
+                                    ondragover="imgInput.onDragOver(event)"
+                                    ondragleave="imgInput.onDragLeave(event)"
+                                    ondrop="imgInput.onDrop(event)">
+                                    <div class="img-dropzone-content" id="img-dropzone-content">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                                        <p>Drag &amp; drop an image here<br><span>or click to browse</span></p>
+                                    </div>
+                                    <img id="img-preview" class="img-preview" src="" alt="" style="display:none;" />
+                                </div>
+                                <input type="file" id="img-file-input" accept="image/*"
+                                    style="display:none;" onchange="imgInput.onFileChange(event)">
+                            </div>
+
+                            <div id="img-panel-url" class="img-panel" style="display:none;">
+                                <input type="text" id="img-url-input"
+                                    placeholder="https://example.com/image.jpg or Google image link"
+                                    oninput="imgInput.onUrlChange(this.value)"
+                                    style="width:100%;">
+                                <img id="img-url-preview" class="img-url-preview" src="" alt=""
+                                    style="display:none; margin-top:10px;" />
+                            </div>
+
+                            <input type="hidden" id="product-image">
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" id="add-button" class="button">Add Product</button>
+                            <button type="button" id="update-button" class="button" style="display:none;">Save
+                                Changes</button>
+                            <button type="button" id="cancel-button" class="button secondary"
+                                style="display:none;">Cancel</button>
+                        </div>
+                        <input type="hidden" id="product-id" value="">
+                    </form>
+                </div>
+
+                <div class="products-panel">
+                    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:4px;">
+                        <h3 style="margin:0;">Current Products</h3>
+                    </div>
+                    <div class="admin-search-wrap">
+                        <svg class="admin-search-icon" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        <input type="search" class="admin-search-input" placeholder="Search products..." oninput="crud.searchAdminProducts(this.value)">
+                    </div>
+                    <div class="admin-product-filter">
+                        <button class="admin-pf-btn active" data-cat="all"      onclick="crud.filterProducts('all')">All</button>
+                        <button class="admin-pf-btn"        data-cat="flower"   onclick="crud.filterProducts('flower')">Flowers</button>
+                        <button class="admin-pf-btn"        data-cat="arrangement" onclick="crud.filterProducts('arrangement')">Arrangements</button>
+                        <button class="admin-pf-btn"        data-cat="chocolates" onclick="crud.filterProducts('chocolates')">Chocolates</button>
+                        <button class="admin-pf-btn"        data-cat="cakes"    onclick="crud.filterProducts('cakes')">Cakes &amp; Pastries</button>
+                        <button class="admin-pf-btn"        data-cat="bundle"   onclick="crud.filterProducts('bundle')">Bundle Gift Sets</button>
+                        <button class="admin-pf-btn"        data-cat="gift"     onclick="crud.filterProducts('gift')">Gifts</button>
+                    </div>
+                    <div id="product-list">
+                        <ul id="products" class="admin-products-list">
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="inventory-section" class="admin-section">
+            <div class="section-header">
+                <h2>Inventory</h2>
+                <p class="section-subtitle">Your catalogue at a glance</p>
+            </div>
+            <div class="catalogue-export-bar">
+                <div class="catalogue-export-text">
+                    <strong>Price list for the delivery company</strong>
+                    <span>Every item grouped by category, with original prices.</span>
+                </div>
+                <div class="catalogue-export-actions">
+                    <button type="button" class="orders-export-btn" onclick="crud.exportCatalogueCsv()"
+                            title="Download the full catalogue as a spreadsheet">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                        Download CSV
+                    </button>
+                    <button type="button" class="orders-export-btn catalogue-print-btn" onclick="crud.printCatalogue()"
+                            title="Open a printable price list — use your browser's Save as PDF">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                        Print / Save as PDF
+                    </button>
+                </div>
+            </div>
+            <div class="admin-stats-grid" id="inventory-stats"></div>
+            <div class="inventory-panels">
+                <div class="inventory-panel">
+                    <h3 class="inventory-panel-title">By Category</h3>
+                    <div id="inventory-by-category"></div>
+                </div>
+                <div class="inventory-panel">
+                    <h3 class="inventory-panel-title">Needs Attention</h3>
+                    <div id="inventory-attention"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="orders-section" class="admin-section orders-section">
+            <div class="section-header">
+                <h2>Incoming Orders <span id="orders-count-label" class="orders-count-label"
+                        style="display:none;"></span></h2>
+                <p class="section-subtitle">Real-time customer orders from the storefront</p>
+                <button type="button" class="orders-export-btn offline-order-btn" onclick="crud.openOfflineOrder()" title="Record a sale that came from Deliveroo, a walk-in customer, or WhatsApp">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    Record Deliveroo / Offline Order
+                </button>
+                <button type="button" class="orders-export-btn" onclick="crud.openManualInvoiceModal()" title="Create a manual invoice for a one-off sale">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6"></path><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><line x1="10" y1="9" x2="8" y2="9"></line></svg>
+                    Create Manual Invoice
+                </button>
+                <button type="button" class="orders-export-btn" onclick="crud.exportOrdersCsv()" title="Download the orders shown below as a CSV spreadsheet">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    Export CSV
+                </button>
+            </div>
+
+            <div id="offline-order-modal" class="offline-modal-overlay" role="dialog" aria-modal="true" aria-label="Record an offline order" onclick="if(event.target===this)crud.closeOfflineOrder()">
+                <div class="offline-modal-box">
+                    <button type="button" class="offline-modal-close" onclick="crud.closeOfflineOrder()" aria-label="Close">&times;</button>
+                    <h3 class="offline-modal-title">Record an Order</h3>
+                    <p class="offline-modal-sub">For sales that didn't come through the website. Stock counts down automatically.</p>
+
+                    <div class="offline-grid">
+                        <div class="form-group">
+                            <label for="offline-source">Where did this order come from?</label>
+                            <select id="offline-source">
+                                <option value="deliveroo">Deliveroo</option>
+                                <option value="walkin">Walk-in customer</option>
+                                <option value="whatsapp">WhatsApp</option>
+                                <option value="instagram">Instagram</option>
+                                <option value="phone">Phone</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="offline-status">Status</label>
+                            <select id="offline-status">
+                                <option value="delivered">Already delivered</option>
+                                <option value="confirmed">Confirmed — preparing now</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="offline-date">Order date</label>
+                            <input type="date" id="offline-date">
+                        </div>
+                        <div class="form-group">
+                            <label for="offline-name">Customer name <span class="field-hint-inline">optional</span></label>
+                            <input type="text" id="offline-name" placeholder="e.g., Sarah">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="offline-item-select">Items sold</label>
+                        <div class="offline-item-picker">
+                            <select id="offline-item-select"></select>
+                            <input type="number" id="offline-item-qty" min="1" step="1" value="1" aria-label="Quantity">
+                            <button type="button" class="button offline-add-btn" onclick="crud.addOfflineItem()">Add</button>
+                        </div>
+                        <div id="offline-items-list" class="offline-items-list"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="offline-total">One-time price for this invoice (AED)</label>
+                        <input type="number" id="offline-total" min="0" step="0.01" placeholder="0.00" oninput="crud.onOfflineTotalEdited(this)">
+                        <p class="field-hint" id="offline-total-hint">Add items and this fills in automatically.</p>
+                        <p class="field-hint">This changes only the invoice for this sale. It does not change the saved product price.</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="offline-notes">Notes <span class="field-hint-inline">optional</span></label>
+                        <input type="text" id="offline-notes" placeholder="e.g., Deliveroo order #12345">
+                    </div>
+
+                    <div class="offline-modal-actions">
+                        <button type="button" class="button offline-cancel-btn" onclick="crud.closeOfflineOrder()">Cancel</button>
+                        <button type="button" class="button" id="offline-save-btn" onclick="crud.saveOfflineOrder()">Record Order</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="manual-invoice-modal" class="offline-modal-overlay" role="dialog" aria-modal="true" aria-label="Create a manual invoice" onclick="if(event.target===this)crud.closeManualInvoiceModal()">
+                <div class="offline-modal-box">
+                    <button type="button" class="offline-modal-close" onclick="crud.closeManualInvoiceModal()" aria-label="Close">&times;</button>
+                    <h3 class="offline-modal-title">Create Manual Invoice</h3>
+                    <p class="offline-modal-sub">Prepare a one-off invoice for a customer without changing the saved product price.</p>
+
+                    <div class="offline-grid">
+                        <div class="form-group">
+                            <label for="manual-invoice-customer">Customer name</label>
+                            <input type="text" id="manual-invoice-customer" placeholder="e.g., Sarah Ali">
+                        </div>
+                        <div class="form-group">
+                            <label for="manual-invoice-phone">Phone</label>
+                            <input type="tel" id="manual-invoice-phone" placeholder="e.g., 050 123 4567">
+                        </div>
+                        <div class="form-group">
+                            <label for="manual-invoice-email">Email <span class="field-hint-inline">optional</span></label>
+                            <input type="email" id="manual-invoice-email" placeholder="e.g., customer@example.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="manual-invoice-date">Invoice date</label>
+                            <input type="date" id="manual-invoice-date">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Items</label>
+                        <div id="manual-invoice-items" class="offline-items-list"></div>
+                        <button type="button" class="button offline-add-btn" onclick="crud.addManualInvoiceRow()">Add Item</button>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="manual-invoice-total">Invoice total (AED)</label>
+                        <input type="number" id="manual-invoice-total" min="0" step="0.01" readonly>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="manual-invoice-notes">Notes <span class="field-hint-inline">optional</span></label>
+                        <input type="text" id="manual-invoice-notes" placeholder="e.g., Wedding order, custom message, delivery location">
+                    </div>
+
+                    <div class="offline-modal-actions">
+                        <button type="button" class="button offline-cancel-btn" onclick="crud.closeManualInvoiceModal()">Cancel</button>
+                        <button type="button" class="button" onclick="crud.printManualInvoice()">Print Invoice</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="admin-search-wrap" style="margin-bottom: 12px;">
+                <svg class="admin-search-icon" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <input type="search" class="admin-search-input" placeholder="Search by tracking ID, name, email, phone, status..." oninput="crud.searchAdminOrders(this.value)">
+            </div>
+
+            <div class="orders-filter-bar">
+                <button class="orders-filter-btn active" data-filter="all" onclick="crud.filterOrders('all')">
+                    All <span class="filter-count" id="filter-count-all">0</span>
+                </button>
+                <button class="orders-filter-btn" data-filter="pending" onclick="crud.filterOrders('pending')">
+                    Pending <span class="filter-count filter-count-pending" id="filter-count-pending">0</span>
+                </button>
+                <button class="orders-filter-btn" data-filter="completed" onclick="crud.filterOrders('completed')">
+                    Completed <span class="filter-count filter-count-completed" id="filter-count-completed">0</span>
+                </button>
+                <button class="orders-filter-btn" data-filter="history" onclick="crud.filterOrders('history')">
+                    History <span class="filter-count" id="filter-count-history">0</span>
+                </button>
+            </div>
+
+            <div id="orders-list" class="orders-list">
+                <div class="empty-state">No orders yet. Orders will appear here in real time.</div>
+            </div>
+        </section>
+
+        <section id="calendar-section" class="admin-section orders-section">
+            <div class="section-header">
+                <h2>Delivery Calendar</h2>
+                <p class="section-subtitle">Orders grouped by delivery date — click a day to see details</p>
+            </div>
+            <div class="admin-calendar-wrap">
+                <div class="cal-nav">
+                    <button class="cal-nav-btn" onclick="crud.calPrev()" aria-label="Previous month">&#8249;</button>
+                    <span class="cal-month-label" id="cal-month-label"></span>
+                    <button class="cal-nav-btn" onclick="crud.calNext()" aria-label="Next month">&#8250;</button>
+                </div>
+                <div id="admin-calendar"></div>
+                <div id="cal-day-orders" class="cal-day-orders-panel" style="display:none;"></div>
+            </div>
+        </section>
+
+        <section id="agents-section" class="admin-section orders-section">
+            <div class="section-header">
+                <h2>Sales Agents</h2>
+                <p class="section-subtitle">Referral codes and commission owed</p>
+                <button type="button" class="orders-export-btn" onclick="agentsAdmin.exportCsv()" title="Download a commission statement for the selected period">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    Export Commissions
+                </button>
+            </div>
+
+            <div class="admin-stats-grid" id="agents-stats"></div>
+
+            <div class="coupons-layout">
+                <div class="coupon-form-panel">
+                    <h3>Add New Agent</h3>
+                    <form id="agent-form" class="admin-form">
+                        <div class="form-group">
+                            <label class="coupon-form-label-tag" for="agent-code">Referral Code</label>
+                            <input type="text" id="agent-code" placeholder="e.g. MS01" autocomplete="off" maxlength="4" minlength="4" pattern="[A-Za-z0-9]{4}" required>
+                            <p class="field-hint">Exactly 4 letters or numbers. The customer types this at checkout.</p>
+                        </div>
+                        <div class="form-group">
+                            <label class="coupon-form-label-tag" for="agent-name">Agent Name</label>
+                            <input type="text" id="agent-name" placeholder="e.g. Maria Santos" autocomplete="off" maxlength="60" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="coupon-form-label-tag" for="agent-rate">Commission %</label>
+                            <input type="number" id="agent-rate" min="0" max="100" step="0.5" placeholder="e.g. 10" required>
+                            <p class="field-hint">Paid on the goods value — delivery fees are excluded.</p>
+                        </div>
+                        <button type="submit" class="button">Add Agent</button>
+                    </form>
+                </div>
+
+                <div class="coupon-list-panel">
+                    <div class="agents-list-header">
+                        <h3>Agents &amp; Commission</h3>
+                        <select id="agent-month-filter" class="filter-dropdown" aria-label="Filter by month"></select>
+                    </div>
+                    <div id="agents-list" class="coupons-list"></div>
+                    <p class="field-hint agents-note">Only paid orders count. Commission is calculated at each agent's
+                        current rate, so change a rate only after paying out the previous period.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="coupons-section" class="admin-section orders-section">
+            <div class="section-header">
+                <h2>Coupon Codes</h2>
+                <p class="section-subtitle">Create and manage discount codes for the store</p>
+            </div>
+            <div class="coupons-layout">
+                <div class="coupon-form-panel">
+                    <h3>Add New Coupon</h3>
+                    <form id="coupon-form" class="admin-form">
+                        <div class="form-group">
+                            <label class="coupon-form-label-tag" for="coupon-code">Coupon Code</label>
+                            <input type="text" id="coupon-code" placeholder="e.g. SUMMER20" autocomplete="off" maxlength="20" required>
+                            <div class="coupon-code-preview" id="coupon-code-preview"></div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="coupon-form-label-tag" for="coupon-type">Discount Type</label>
+                            <select id="coupon-type">
+                                <option value="percent">Percent Off (%)</option>
+                                <option value="fixed">Fixed Amount (AED)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group" id="coupon-value-group">
+                            <label class="coupon-form-label-tag" for="coupon-value">Discount Value</label>
+                            <input type="number" id="coupon-value" min="0" step="0.01" placeholder="e.g. 10">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="coupon-form-label-tag" for="coupon-expiry">Expiry Date <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#aaa;">— optional</span></label>
+                            <input type="date" id="coupon-expiry">
+                        </div>
+
+                        <div class="form-actions" style="margin-top:4px;">
+                            <button type="submit" class="button" style="width:100%;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                Add Coupon
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="coupon-list-panel">
+                    <h3>All Coupons</h3>
+                    <div id="coupons-list">
+                        <div class="empty-state" style="padding:20px 0;">Loading…</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="messages-section" class="admin-section orders-section">
+            <div class="section-header">
+                <h2>Contact Messages <span id="messages-count-label" class="orders-count-label" style="display:none;"></span></h2>
+                <p class="section-subtitle">Messages sent through the Contact page</p>
+            </div>
+            <div id="admin-messages-list" class="admin-reviews-list orders-list">
+                <div class="empty-state">Loading…</div>
+            </div>
+        </section>
+
+        <section id="reviews-admin-section" class="admin-section orders-section">
+            <div class="section-header">
+                <h2>Customer Reviews <span id="reviews-count-label" class="orders-count-label" style="display:none;"></span></h2>
+                <p class="section-subtitle">All reviews submitted through the website</p>
+            </div>
+            <div id="admin-reviews-list" class="admin-reviews-list orders-list">
+                <div class="empty-state">No reviews yet.</div>
+            </div>
+        </section>
+
+    </main>
+
+    <div id="admin-img-lightbox" class="admin-lightbox-overlay" onclick="this.classList.remove('active')">
+        <button class="admin-lightbox-close" onclick="document.getElementById('admin-img-lightbox').classList.remove('active')" aria-label="Close">&times;</button>
+        <img id="admin-lightbox-img" class="admin-lightbox-img" src="" alt="Product image" onclick="event.stopPropagation()">
+        <div class="admin-lightbox-meta">
+            <p id="admin-lightbox-caption" class="admin-lightbox-caption"></p>
+            <p id="admin-lightbox-filename" class="admin-lightbox-filename">Current file: not available</p>
+            <button type="button" id="admin-img-download-btn" class="button admin-lightbox-download-btn">Download image</button>
+        </div>
+    </div>
+
+    <div id="delete-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <div class="modal">
+            <div class="modal-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path>
+                    <path d="M10 11v6"></path>
+                    <path d="M14 11v6"></path>
+                    <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path>
+                </svg>
+            </div>
+            <h3 id="modal-title">Delete Product</h3>
+            <p id="modal-body">Are you sure you want to permanently delete <strong id="modal-flower-name"></strong>?
+                This action cannot be undone.</p>
+            <div class="modal-actions">
+                <button id="modal-cancel" class="button secondary">Cancel</button>
+                <button id="modal-confirm" class="button danger">Delete</button>
+            </div>
+        </div>
+    </div>
+
+        <footer>
+        <div class="footer-inner">
+            <p class="footer-brand">Velvet Royals Flowershop</p>
+            <p>&copy; <span class="footer-year">2026</span> Velvet Royals Flowershop. All rights reserved.</p>
+            <p>Delivering happiness, one flower at a time.</p>
+            <div class="footer-social">
+                <a href="https://www.facebook.com/profile.php?id=61592537082199" class="social-link social-facebook" aria-label="Facebook" target="_blank" rel="noopener"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></a>
+                <a href="https://www.instagram.com/velvet_royals.ae?utm_source=qr&igsh=MW10NWowcXU5bXMyeA%3D%3D" class="social-link social-instagram" aria-label="Instagram" target="_blank" rel="noopener"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
+                <a href="https://api.whatsapp.com/send?phone=971507443100&text=Hi%20Velvet%20Royals!%20I%27d%20like%20to%20inquire%20about%20your%20flowers." class="social-link social-whatsapp" aria-label="WhatsApp" target="_blank" rel="noopener"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg></a>
+                <a href="https://www.tiktok.com/@velvet.royals_flowershop?_r=1&amp;_t=ZS-97RZqcRzIDS" class="social-link social-tiktok" aria-label="TikTok" target="_blank" rel="noopener"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.16 8.16 0 0 0 4.77 1.52V6.73a4.85 4.85 0 0 1-1-.04z"/></svg></a>            </div>
+            <div class="footer-policy-links">
+                <a href="privacy.html">Privacy Policy</a>
+                <a href="terms.html">Terms &amp; Conditions</a>
+                <a href="shipping.html">Shipping Policy</a>
+                <a href="returns.html">Returns</a>
+            </div>
+        </div>
+    </footer>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+
+    <script src="../js/utils.js?v=20260811b"></script>
+    <script src="../js/tracking-id.js?v=20260811b"></script>
+    <script src="../js/firebase-config.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/crud.js?v=20260924c"></script>
+    <script src="../js/reviews.js"></script>
+    <script src="../js/admin-coupons.js"></script>
+    <script src="../js/admin-agents.js?v=20260811b"></script>
+    <script src="../js/admin-messages.js?v=20260924c"></script>
+    <script>
+        // ===== Image Input Module =====
+        const imgInput = (() => {
+            let activeTab = 'upload';
+
+            const setHidden = (val) => {
+                const el = document.getElementById('product-image');
+                if (el) el.value = val;
+            };
+
+            const switchTab = (tab) => {
+                activeTab = tab;
+                document.getElementById('img-tab-upload').classList.toggle('active', tab === 'upload');
+                document.getElementById('img-tab-url').classList.toggle('active', tab === 'url');
+                document.getElementById('img-panel-upload').style.display = tab === 'upload' ? '' : 'none';
+                document.getElementById('img-panel-url').style.display   = tab === 'url'    ? '' : 'none';
+                setHidden('');
+            };
+
+            const setPreview = (src) => {
+                const prev = document.getElementById('img-preview');
+                const cont = document.getElementById('img-dropzone-content');
+                if (!prev || !cont) return;
+                if (src) {
+                    prev.src = src;
+                    prev.style.display = 'block';
+                    cont.style.display = 'none';
+                } else {
+                    prev.src = '';
+                    prev.style.display = 'none';
+                    cont.style.display = 'flex';
+                }
+            };
+
+            const setProgress = (pct) => {
+                const cont = document.getElementById('img-dropzone-content');
+                if (!cont) return;
+                cont.style.display = 'flex';
+                cont.innerHTML = `<p style="text-align:center;color:#800020;font-weight:600;">Uploading... ${pct}%<br><span style="font-size:0.8em;font-weight:400;color:#888;">Please wait</span></p>`;
+            };
+
+            const resetDropzoneContent = () => {
+                const cont = document.getElementById('img-dropzone-content');
+                if (cont) cont.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                    <p>Drag &amp; drop an image here<br><span>or click to browse</span></p>`;
+            };
+
+            const slugifyProductName = (value) => {
+                const base = String(value || 'product-image')
+                    .trim()
+                    .toLowerCase()
+                    .replace(/&/g, 'and')
+                    .replace(/[^a-z0-9]+/g, '-')
+                    .replace(/^-+|-+$/g, '')
+                    .replace(/--+/g, '-');
+                return base || 'product-image';
+            };
+
+            const uploadToStorage = (file) => {
+                if (!file || !file.type.startsWith('image/')) return;
+
+                // 5MB limit
+                if (file.size > 5 * 1024 * 1024) {
+                    showToast('Image too large | maximum size is 5MB', 'error');
+                    return;
+                }
+
+                // Show local preview immediately for instant feedback
+                const reader = new FileReader();
+                reader.onload = (e) => setPreview(e.target.result);
+                reader.readAsDataURL(file);
+
+                setProgress(0);
+
+                const productName = document.getElementById('product-name')?.value || 'product-image';
+                const extension = (file.name.includes('.') ? '.' + file.name.split('.').pop().toLowerCase() : '.jpg');
+                const safeName = slugifyProductName(productName) + extension;
+                const storageRef = firebase.storage().ref('products/' + safeName);
+                const uploadTask = storageRef.put(file);
+
+                uploadTask.on('state_changed',
+                    (snapshot) => {
+                        const pct = Math.round(snapshot.bytesTransferred / snapshot.totalBytes * 100);
+                        setProgress(pct);
+                    },
+                    (error) => {
+                        console.error('Upload error:', error);
+                        resetDropzoneContent();
+                        setPreview(null);
+                        setHidden('');
+                        showToast('Image upload failed: ' + error.message, 'error');
+                    },
+                    () => {
+                        uploadTask.snapshot.ref.getDownloadURL()
+                            .then((url) => {
+                                setPreview(url);
+                                setHidden(url);
+                            })
+                            .catch((err) => {
+                                console.error('getDownloadURL error:', err);
+                                resetDropzoneContent();
+                                setPreview(null);
+                                setHidden('');
+                                showToast('Upload succeeded but could not get image URL. Please try again.', 'error');
+                            });
+                    }
+                );
+            };
+
+            const onFileChange = (event) => {
+                const file = event.target.files[0];
+                if (file) uploadToStorage(file);
+            };
+
+            const onUrlChange = (url) => {
+                setHidden(url);
+                const prev = document.getElementById('img-url-preview');
+                if (!prev) return;
+                if (url) {
+                    prev.src = url;
+                    prev.style.display = 'block';
+                    prev.onerror = () => { prev.style.display = 'none'; };
+                    prev.onload  = () => { prev.style.display = 'block'; };
+                } else {
+                    prev.style.display = 'none';
+                }
+            };
+
+            const onDragOver  = (e) => { e.preventDefault(); document.getElementById('img-dropzone').classList.add('drag-over'); };
+            const onDragLeave = ()  => { document.getElementById('img-dropzone').classList.remove('drag-over'); };
+            const onDrop      = (e) => {
+                e.preventDefault();
+                onDragLeave();
+                const file = e.dataTransfer.files[0];
+                if (file && file.type.startsWith('image/')) uploadToStorage(file);
+            };
+
+            // Reset image input to clean state (called by crud.js exitEditMode)
+            const reset = () => {
+                setHidden('');
+                setPreview(null);
+                resetDropzoneContent();
+                document.getElementById('img-url-input').value = '';
+                document.getElementById('img-url-preview').style.display = 'none';
+                document.getElementById('img-file-input').value = '';
+                switchTab('upload');
+            };
+
+            return { switchTab, onFileChange, onUrlChange, onDragOver, onDragLeave, onDrop, reset };
+        })();
+    </script>
+    <script>
+        // Availability + visibility toggle label updaters
+        document.addEventListener('DOMContentLoaded', () => {
+            const toggle = document.getElementById('product-available');
+            const label  = document.getElementById('availability-label');
+            if (toggle && label) {
+                toggle.addEventListener('change', () => {
+                    label.textContent = toggle.checked ? 'In Stock' : 'Sold Out';
+                    label.className   = 'avail-label ' + (toggle.checked ? 'avail-in-stock' : 'avail-sold-out');
+                });
+            }
+            const hiddenToggle = document.getElementById('product-hidden');
+            const hiddenLabel  = document.getElementById('hidden-label');
+            if (hiddenToggle && hiddenLabel) {
+                hiddenToggle.addEventListener('change', () => {
+                    hiddenLabel.textContent = hiddenToggle.checked ? 'Hidden from store' : 'Visible in store';
+                    hiddenLabel.className   = 'avail-label ' + (hiddenToggle.checked ? 'avail-sold-out' : 'avail-in-stock');
+                });
+            }
+        });
+    </script>
+    <script>
+        function getCurrentProductFileName(src) {
+            if (!src) return 'product-image.jpg';
+            try {
+                const url = new URL(src, window.location.href);
+                const name = decodeURIComponent(url.pathname.split('/').pop() || 'product-image.jpg');
+                return name || 'product-image.jpg';
+            } catch (error) {
+                const fallback = String(src).split('?')[0].split('#')[0].split('/').pop();
+                return fallback || 'product-image.jpg';
+            }
+        }
+
+        function sanitizeDownloadName(value) {
+            return String(value || 'product-image')
+                .replace(/[\\/:*?"<>|]+/g, ' ')
+                .replace(/\s+/g, ' ')
+                .trim();
+        }
+
+        function buildFriendlyDownloadName(productName, src) {
+            const ext = (getCurrentProductFileName(src).match(/\.[a-zA-Z0-9]+$/) || ['.jpg'])[0];
+            const base = sanitizeDownloadName(productName || 'Product Image');
+            return (base || 'Product Image') + ext;
+        }
+
+        async function triggerProductImageDownload(src, productName) {
+            const downloadName = buildFriendlyDownloadName(productName, src);
+            try {
+                const response = await fetch(src, { mode: 'cors' });
+                if (!response.ok) throw new Error('Failed to fetch image');
+                const blob = await response.blob();
+                const objectUrl = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = objectUrl;
+                link.download = downloadName;
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+                setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+            } catch (error) {
+                console.error('Product image download failed:', error);
+                const fallback = document.createElement('a');
+                fallback.href = src;
+                fallback.download = downloadName;
+                document.body.appendChild(fallback);
+                fallback.click();
+                fallback.remove();
+            }
+        }
+
+        function setAdminLightboxImage(src, name, fileName) {
+            const lb = document.getElementById('admin-img-lightbox');
+            const img = document.getElementById('admin-lightbox-img');
+            const caption = document.getElementById('admin-lightbox-caption');
+            const fileLabel = document.getElementById('admin-lightbox-filename');
+            const downloadBtn = document.getElementById('admin-img-download-btn');
+
+            if (!lb || !img || !caption || !fileLabel || !downloadBtn) return;
+
+            const currentName = fileName || getCurrentProductFileName(src) || 'product-image.jpg';
+            img.src = src;
+            caption.textContent = name || 'Product image';
+            fileLabel.textContent = 'Current file: ' + currentName;
+
+            downloadBtn.onclick = () => triggerProductImageDownload(src, name);
+
+            lb.classList.add('active');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Use session-only persistence: admin is signed out when browser/tab closes
+            firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION)
+                .catch(() => {});
+
+            // Verify admin role before showing any content
+            authModule.requireAdmin('admin-main');
+
+            // After auth resolves — populate admin name + update nav
+            firebase.auth().onAuthStateChanged(user => {
+                if (user) {
+                    authModule.updateNavAuth();
+
+                    // Show full name in the toolbar
+                    authModule.getUserData(user.uid).then(data => {
+                        const name = (data && data.name) ? data.name : user.email;
+                        const toolbarName = document.getElementById('admin-toolbar-name');
+                        if (toolbarName) toolbarName.textContent = name;
+                    });
+
+                    // Remove the loading guard
+                    const guard = document.getElementById('auth-guard');
+                    if (guard) setTimeout(() => guard.remove(), 200);
+
+                    reviewsModule.initAdmin();
+                    couponsAdmin.init();
+                    agentsAdmin.init();
+                    messagesAdmin.init();
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Review your flower selections and proceed to checkout. Same-day delivery available.">
+    <title>Shopping Cart | Velvet Royals Flowershop</title>
+    <link rel="icon" type="image/png" href="../images/favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css?v=20260811b">
+    <link rel="stylesheet" href="../css/responsive.css?v=20260811b">
+</head>
+
+<body>
+    <div class="social-topbar">
+        <a href="https://www.facebook.com/profile.php?id=61592537082199" class="social-topbar-btn social-topbar-fb" aria-label="Facebook" target="_blank" rel="noopener"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></a>
+        <a href="https://www.instagram.com/velvet_royals.ae?utm_source=qr&igsh=MW10NWowcXU5bXMyeA%3D%3D" class="social-topbar-btn social-topbar-ig" aria-label="Instagram" target="_blank" rel="noopener"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
+        <a href="https://api.whatsapp.com/send?phone=971507443100&text=Hi%20Velvet%20Royals!" class="social-topbar-btn social-topbar-wa" aria-label="WhatsApp" target="_blank" rel="noopener"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg></a>
+        <a href="https://www.tiktok.com/@velvet.royals_flowershop?_r=1&_t=ZS-97RZqcRzIDS" class="social-topbar-btn social-topbar-tt" aria-label="TikTok" target="_blank" rel="noopener"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.16 8.16 0 0 0 4.77 1.52V6.73a4.85 4.85 0 0 1-1-.04z"/></svg></a>
+    </div>
+    <header>
+        <div class="header-inner">
+            <h1><a href="../index.html"><img src="../images/logo-header.png" alt="Velvet Royals Flowershop Logo" class="header-logo"></a></h1>
+            <button class="nav-burger" id="nav-burger" aria-label="Toggle menu" aria-expanded="false">
+                <span></span><span></span><span></span>
+            </button>
+            <nav id="main-nav">
+                <ul>
+                    <li><a href="../index.html">Home</a></li>
+                    <li><a href="products.html">Products</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    
+                    <li><a href="wishlist.html"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>Wishlist<span class="nav-wishlist-badge" style="display:none;">0</span></a></li>
+                    <li><a href="cart.html"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>Cart<span class="nav-cart-badge" style="display:none;">0</span></a></li>
+                    <li id="nav-auth-item"></li>
+                    <li id="nav-logout-item" style="display:none;">
+                        <button onclick="authModule.logout()" class="btn-black-logout">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                            Sign Out
+                        </button>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+        <div class="nav-overlay" id="nav-overlay"></div>
+    </header>
+
+    <main>
+        <section class="cart-section">
+            <div class="section-header">
+                <h2>Complete Your Order</h2>
+                <p class="section-subtitle">Review your items and fill in your delivery details</p>
+            </div>
+
+            <div class="checkout-page-grid">
+
+                <div class="checkout-page-left">
+
+                    <div class="checkout-block">
+                        <h3 class="checkout-block-title">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+                            Your Items
+                        </h3>
+                        <div id="free-shipping-bar" class="free-shipping-bar not-qualified" style="display:block;">
+                            <div id="free-shipping-fill" class="free-shipping-fill" style="width:0%;"></div>
+                            <span id="free-shipping-text" class="free-shipping-text">Delivery fees apply based on selected area.</span>
+                        </div>
+                        <div id="cart-items" class="cart-items-container"></div>
+                        <div id="cart-subtotal-row" class="cart-subtotal-row" style="display:none;">
+                            <span id="total-items" class="cart-subtotal-items"></span>
+                            <span id="total-price" class="cart-subtotal-price"></span>
+                        </div>
+                    </div>
+
+                    <div class="checkout-block" id="checkout-form-block">
+                        <h3 class="checkout-block-title">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                            Delivery Details
+                        </h3>
+                        <form id="checkout-form" class="checkout-form">
+                            <div class="checkout-form-grid">
+
+                                <div class="form-group checkout-full-width">
+                                    <label>Fulfillment Method</label>
+                                    <div class="delivery-toggle">
+                                        <button type="button" class="delivery-toggle-btn active" id="toggle-delivery" onclick="app.setDeliveryType('delivery')">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                                            Delivery
+                                        </button>
+                                        <button type="button" class="delivery-toggle-btn" id="toggle-pickup" onclick="app.setDeliveryType('pickup')">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                                            In-Store Pickup
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div id="delivery-fields" class="checkout-full-width">
+                                    <div class="checkout-form-grid">
+                                        <div class="form-group checkout-full-width">
+                                            <label for="checkout-area">Area / City <span class="req">*</span></label>
+                                            <select id="checkout-area" onchange="app.updateDeliveryFee()" required>
+                                                <option value="">-- Select your area --</option>
+                                                <option value="Dubai|25">Dubai &mdash; AED 25</option>
+                                                <option value="Sharjah|35">Sharjah &mdash; AED 35</option>
+                                                <option value="Ajman|70">Ajman &mdash; AED 70</option>
+                                                <option value="Umm Al Quwain|90">Umm Al Quwain &mdash; AED 90</option>
+                                                <option value="Ras Al Khaimah|90">Ras Al Khaimah &mdash; AED 90</option>
+                                                <option value="Abu Dhabi|150">Abu Dhabi &mdash; AED 150</option>
+                                                <option value="Al Ain|150">Al Ain &mdash; AED 150</option>
+                                                <option value="Fujairah|150">Fujairah &mdash; AED 150</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group checkout-full-width">
+                                            <label for="checkout-address">Delivery Address <span class="req">*</span></label>
+                                            <input type="text" id="checkout-address" placeholder="Building, street, area details" required>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="checkout-date" id="checkout-date-label">Delivery Date <span class="req">*</span></label>
+                                    <input type="date" id="checkout-date" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="checkout-timeslot" id="checkout-time-label">Delivery Time Slot <span class="req">*</span></label>
+                                    <select id="checkout-timeslot" onchange="app.updateTimeslotFee()" required>
+                                        <option value="">-- Select time slot --</option>
+                                        <optgroup label="Standard Delivery">
+                                            <option value="09:00 - 12:00|0">Morning &nbsp; 09:00 &ndash; 12:00</option>
+                                            <option value="12:00 - 15:00|0">Afternoon &nbsp; 12:00 &ndash; 15:00</option>
+                                            <option value="15:00 - 18:00|0">Evening &nbsp; 15:00 &ndash; 18:00</option>
+                                            <option value="18:00 - 21:00|0">Night &nbsp; 18:00 &ndash; 21:00</option>
+                                        </optgroup>
+                                        <optgroup label="Express (+AED 20)">
+                                            <option value="Express: Within 2 Hours|20">Express &mdash; Within 2 Hours &nbsp; (+AED 20)</option>
+                                        </optgroup>
+                                        <optgroup label="Midnight Delivery (+AED 25)">
+                                            <option value="Midnight: 22:00 - 00:00|25">Midnight &nbsp; 22:00 &ndash; 00:00 &nbsp; (+AED 25)</option>
+                                        </optgroup>
+                                    </select>
+                                    <p class="field-hint" id="sameday-hint" style="display:none;">It's past 14:00 — you can still choose today, and we'll confirm same-day availability with you on WhatsApp.</p>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="checkout-name">Full Name <span class="req">*</span></label>
+                                    <input type="text" id="checkout-name" placeholder="Your full name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="checkout-phone">Phone Number <span class="req">*</span></label>
+                                    <input type="tel" id="checkout-phone" placeholder="+971 50 000 0000" required>
+                                </div>
+                                <div class="form-group checkout-full-width">
+                                    <label for="checkout-email">Email Address <span style="font-weight:300;color:var(--color-text-light)">(Optional)</span></label>
+                                    <input type="email" id="checkout-email" placeholder="your@email.com">
+                                </div>
+                                <div class="form-group checkout-full-width">
+                                    <label for="checkout-notes">Special Notes <span style="font-weight:300;color:var(--color-text-light)">(Optional)</span></label>
+                                    <textarea id="checkout-notes" rows="2" placeholder="Any special instructions, message card text, or delivery notes..."></textarea>
+                                </div>
+
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="checkout-page-right">
+                    <div class="checkout-sidebar-sticky">
+
+                        <div class="checkout-block">
+                            <h3 class="checkout-block-title">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                                Order Summary
+                            </h3>
+                            <div id="checkout-order-summary"></div>
+                        </div>
+
+                        <div class="checkout-block">
+                            <div class="form-group">
+                                <label for="checkout-coupon">Discount Code</label>
+                                <div class="coupon-row">
+                                    <input type="text" id="checkout-coupon" placeholder="Enter code (e.g. VELVET10)" style="text-transform:uppercase;">
+                                    <button type="button" class="button secondary coupon-apply-btn" onclick="app.applyCoupon()">Apply</button>
+                                </div>
+                                <p id="coupon-msg" class="coupon-msg" style="display:none;"></p>
+                            </div>
+
+                            <div class="form-group referral-group">
+                                <label for="checkout-referral">Referral Code <span class="field-hint-inline">optional</span></label>
+                                <div class="coupon-row">
+                                    <input type="text" id="checkout-referral" placeholder="4-character agent code (e.g. MS01)" style="text-transform:uppercase;" autocomplete="off" maxlength="4">
+                                    <button type="button" class="button secondary coupon-apply-btn" onclick="app.applyReferral()">Apply</button>
+                                </div>
+                                <p id="referral-msg" class="coupon-msg" style="display:none;"></p>
+                            </div>
+                        </div>
+
+                        <div class="checkout-block">
+                            <div class="payment-sticker" aria-label="Accepted payment methods">
+                                <div class="payment-sticker-note">
+                                    <svg class="payment-sticker-lock" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                        <path d="M7 10V8a5 5 0 0 1 10 0v2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <rect x="5" y="10" width="14" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/>
+                                        <circle cx="12" cy="15" r="1.4" fill="currentColor"/>
+                                    </svg>
+                                    <span>Payment via Geidea — you'll receive a secure payment link on WhatsApp after placing your order.</span>
+                                </div>
+
+                                <div class="payment-sticker-row">
+                                    <span class="payment-sticker-item visa-item">VISA</span>
+                                    <span class="payment-sticker-item mc-item" aria-label="Mastercard">
+                                        <span class="mc-red"></span>
+                                        <span class="mc-yellow"></span>
+                                    </span>
+                                    <span class="payment-sticker-item amex-item">AMEX</span>
+                                </div>
+
+                                <div class="payment-sticker-row">
+                                    <span class="payment-sticker-item paypal-item">PayPal</span>
+                                    <span class="payment-sticker-item apple-item">Apple Pay</span>
+                                    <span class="payment-sticker-item gcash-item">GCash</span>
+                                </div>
+
+                                <div class="payment-sticker-row">
+                                    <span class="payment-sticker-item mada-item">MADA</span>
+                                    <span class="payment-sticker-item samsung-item">Samsung Pay</span>
+                                    <span class="payment-sticker-item alipay-item">Alipay</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="checkout-block">
+                            <div class="substitution-notice">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                                <div>
+                                    <strong>Please note</strong>
+                                    <p>Flowers and materials may vary slightly depending on availability. Any substitutions
+                                       will be of equal or greater value while maintaining the overall style and premium
+                                       quality. Our florist may contact you for approval before making significant
+                                       substitutions.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" form="checkout-form" id="checkout-submit" class="button checkout-btn" style="width:100%;margin-bottom:10px;">
+                            Place Order
+                        </button>
+                        <a href="products.html" class="button secondary" style="width:100%;text-align:center;display:block;">
+                            Continue Shopping
+                        </a>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="guest-prompt-modal" class="modal-overlay" role="dialog" aria-modal="true">
+        <div class="modal">
+            <div class="modal-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+            </div>
+            <h3>Sign In to Checkout</h3>
+            <p>You need an account to place an order. It only takes a minute to create one!</p>
+            <div class="modal-actions">
+                <button id="guest-prompt-cancel" class="button secondary">Cancel</button>
+                <a href="login.html" class="button">Sign In / Register</a>
+            </div>
+        </div>
+    </div>
+
+    <div id="success-modal" class="modal-overlay" role="dialog" aria-modal="true">
+        <div class="modal">
+            <div class="modal-icon success-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+            </div>
+            <h3>Order Placed!</h3>
+            <p>Thank you for your order. We've received your details and will start preparing your flowers right away.</p>
+            <div id="success-payment-reminder" class="success-payment-reminder" style="display:none;"></div>
+            <div id="success-order-id" style="display:none;"></div>
+            <div class="modal-actions" style="justify-content: center;">
+                <a href="../index.html" class="button" style="max-width: 200px;">Back to Home</a>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-inner">
+            <p class="footer-brand">Velvet Royals Flowershop</p>
+            <p>&copy; <span class="footer-year">2026</span> Velvet Royals Flowershop. All rights reserved.</p>
+            <p>Delivering happiness, one flower at a time.</p>
+            <div class="footer-social">
+                <a href="https://www.facebook.com/profile.php?id=61592537082199" class="social-link social-facebook" aria-label="Facebook" target="_blank" rel="noopener"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></a>
+                <a href="https://www.instagram.com/velvet_royals.ae?utm_source=qr&igsh=MW10NWowcXU5bXMyeA%3D%3D" class="social-link social-instagram" aria-label="Instagram" target="_blank" rel="noopener"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
+                <a href="https://api.whatsapp.com/send?phone=971507443100&text=Hi%20Velvet%20Royals!%20I%27d%20like%20to%20inquire%20about%20your%20flowers." class="social-link social-whatsapp" aria-label="WhatsApp" target="_blank" rel="noopener"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg></a>
+                <a href="https://www.tiktok.com/@velvet.royals_flowershop?_r=1&amp;_t=ZS-97RZqcRzIDS" class="social-link social-tiktok" aria-label="TikTok" target="_blank" rel="noopener"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.16 8.16 0 0 0 4.77 1.52V6.73a4.85 4.85 0 0 1-1-.04z"/></svg></a>
+            </div>
+            <div class="footer-policy-links">
+                <a href="privacy.html">Privacy Policy</a>
+                <a href="terms.html">Terms &amp; Conditions</a>
+                <a href="shipping.html">Shipping Policy</a>
+                <a href="returns.html">Returns</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-functions-compat.js"></script>
+    <script src="../js/utils.js?v=20260811b"></script>
+    <script src="../js/tracking-id.js?v=20260811b"></script>
+    <script src="../js/firebase-config.js"></script>
+    <script src="../js/auth.js"></script>
+    <script src="../js/app.js?v=20260924c"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            authModule.updateNavAuth();
+
+            // Pre-fill form with logged-in user info
+            firebase.auth().onAuthStateChanged(user => {
+                if (user) {
+                    authModule.getUserData(user.uid).then(data => {
+                        if (data) {
+                            const nameEl  = document.getElementById('checkout-name');
+                            const emailEl = document.getElementById('checkout-email');
+                            if (nameEl  && !nameEl.value)  nameEl.value  = data.name  || '';
+                            if (emailEl && !emailEl.value) emailEl.value = data.email || '';
+                        }
+                    });
+                }
+            });
+
+            // Guest prompt cancel
+            const guestCancel = document.getElementById('guest-prompt-cancel');
+            if (guestCancel) {
+                guestCancel.addEventListener('click', () => {
+                    document.getElementById('guest-prompt-modal').classList.remove('active');
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>

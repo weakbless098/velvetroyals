@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+
+Disallow: /pages/admin.html
+Disallow: /pages/cart.html
+Disallow: /pages/orders.html
+Disallow: /pages/wishlist.html
+Disallow: /pages/login.html
+Disallow: /pages/auth-action.html
+Disallow: /seed.html
+
+Sitemap: https://velvetroyals.com/sitemap.xml

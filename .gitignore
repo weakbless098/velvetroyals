@@ -1,0 +1,37 @@
+# dependencies
+node_modules/
+
+# local tooling / editor
+.vscode/
+.claude/
+.tsupgrader/
+
+# Firebase local state
+.firebase/
+.firebaserc
+
+# secrets (Gmail app password, Geidea keys, admin key) — never commit
+.env
+functions/.env
+
+# generated test output
+test-results/
+test-screenshots/
+qa-screenshots/
+mobile-screenshots/
+screenshots/
+
+# image artifacts and logs
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.webp
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# local JDK bundle (kept out of GitHub due to size limits)
+oracleJdk-26/
