@@ -139,9 +139,11 @@ const crud = (() => {
             flowers = {};
             if (snapshot.exists()) {
                 snapshot.forEach(childSnapshot => {
+                    // The database key is the product's real ID; a stored
+                    // `id` field must never override it.
                     flowers[childSnapshot.key] = {
-                        id: childSnapshot.key,
-                        ...childSnapshot.val()
+                        ...childSnapshot.val(),
+                        id: childSnapshot.key
                     };
                 });
             }
@@ -583,41 +585,42 @@ const crud = (() => {
         : p.inStock === false ? 'Sold out'
         : 'Available';
 
-    const exportCatalogueCsv = () => {
+    const exportCatalogueXlsx = () => {
         const groups = _catalogueGroups();
         const count  = groups.reduce((n, g) => n + g.items.length, 0);
         if (!count) { showToast('No products to export', 'error'); return; }
 
-        const header = ['Category', 'Item Name', 'Original Price (AED)', 'Sale Price (AED)', 'Stock Qty', 'Status'];
         const rows = [];
         groups.forEach(g => {
             g.items.forEach(p => {
-                const sale = _salePrice(p);
                 rows.push([
+                    p.id,
                     g.label,
                     _cleanName(p),
-                    _origPrice(p).toFixed(2),
-                    sale === null ? '' : sale.toFixed(2),
-                    (p.stockQty === null || p.stockQty === undefined) ? '' : p.stockQty,
+                    _origPrice(p),
+                    _salePrice(p),
+                    (p.stockQty === null || p.stockQty === undefined) ? null : p.stockQty,
                     _statusLabel(p)
                 ]);
             });
         });
 
-        const csv = [header].concat(rows)
-            .map(r => r.map(v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"').join(','))
-            .join('\r\n');
-
-        // The BOM makes Excel open UTF-8 correctly instead of mangling accents.
-        const blob = new Blob([String.fromCharCode(0xFEFF) + csv], { type: 'text/csv;charset=utf-8;' });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = 'velvet-royals-catalogue-' + new Date().toISOString().slice(0, 10) + '.csv';
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        setTimeout(() => URL.revokeObjectURL(a.href), 5000);
-        showToast('Exported ' + count + ' item' + (count !== 1 ? 's' : '') + ' to CSV');
+        xlsxExport.download('velvet-royals-catalogue-' + new Date().toISOString().slice(0, 10) + '.xlsx', [{
+            name: 'Price List',
+            columns: [
+                // Lets "Update Prices" match rows back to products exactly,
+                // even when two products share a name.
+                { header: 'Product ID', width: 23 },
+                { header: 'Category', width: 18 },
+                { header: 'Item Name', width: 40 },
+                { header: 'Original Price (AED)', type: 'money', width: 20 },
+                { header: 'Sale Price (AED)', type: 'money', width: 17 },
+                { header: 'Stock Qty', type: 'number', width: 11 },
+                { header: 'Status', width: 12 }
+            ],
+            rows
+        }]);
+        showToast('Exported ' + count + ' item' + (count !== 1 ? 's' : '') + ' to Excel');
     };
 
     // Presentable one-document version — this is what actually gets handed to
@@ -1283,47 +1286,64 @@ const crud = (() => {
         }
     };
 
-    // Export the currently visible orders (filter + search applied) as a
-    // CSV for accounting / bank records.
-    const exportOrdersCsv = () => {
+    // Export the currently visible orders (filter + search applied) as an
+    // Excel sheet for accounting / bank records.
+    const exportOrdersXlsx = () => {
         const orders = _applyOrderSearch(getFilteredOrders());
         if (orders.length === 0) { showToast('No orders to export', 'error'); return; }
 
-        const header = ['Date', 'Source', 'Tracking ID', 'Customer', 'Phone', 'Email', 'Items', 'Subtotal (AED)',
-            'Delivery Fee (AED)', 'Discount (AED)', 'Coupon', 'Total (AED)', 'Payment Method',
-            'Payment Status', 'Order Status', 'Referral Code', 'Agent', 'Delivery Company', 'Fulfillment', 'Date Requested', 'Time Slot', 'Area', 'Address', 'Notes'];
-
+        const num = (v) => (v === null || v === undefined || v === '') ? null : parseFloat(v);
         const rows = orders.map(o => {
             const c = o.customer || {};
             const f = o.fulfillment || {};
             const items = (o.items || []).map(i => (i.name || '') + ' x' + (i.quantity || 1)).join('; ');
             return [
-                o.timestamp ? new Date(o.timestamp).toLocaleString('en-GB') : '',
+                o.timestamp || null,
                 SOURCE_LABELS[o.source] || 'Website',
-                o.key, c.name || '', c.phone || '', c.email || '', items,
-                o.subtotal != null ? o.subtotal : '', o.deliveryFee != null ? o.deliveryFee : '',
-                o.discount || 0, o.coupon || '', o.total != null ? o.total : '',
+                rvTrackingId(o.key), o.key, c.name || '', c.phone || '', c.email || '', items,
+                num(o.subtotal), num(o.deliveryFee), num(o.slotSurcharge), num(o.discount) || 0,
+                o.coupon || '', num(o.total),
                 payLabels[o.paymentMethod] || o.paymentMethod || '', o.paymentStatus || '',
                 o.status || '', o.agentCode || '', o.agentName || '',
                 deliveryCompanyLabels[o.deliveryCompany] || o.deliveryCompany || '',
-                f.type || '', f.date || '', f.timeSlot || '', f.area || '', f.address || '',
+                f.type || '', f.date || null, f.timeSlot || '', f.area || '', f.address || '',
                 c.notes || ''
             ];
         });
 
-        const csv = [header].concat(rows)
-            .map(r => r.map(v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"').join(','))
-            .join('\r\n');
-
-        const blob = new Blob([String.fromCharCode(0xFEFF) + csv], { type: 'text/csv;charset=utf-8;' });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = 'velvet-royals-orders-' + new Date().toISOString().slice(0, 10) + '.csv';
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        setTimeout(() => URL.revokeObjectURL(a.href), 5000);
-        showToast('Exported ' + orders.length + ' order' + (orders.length !== 1 ? 's' : '') + ' to CSV');
+        xlsxExport.download('velvet-royals-orders-' + new Date().toISOString().slice(0, 10) + '.xlsx', [{
+            name: 'Orders',
+            columns: [
+                { header: 'Date', type: 'datetime', width: 17 },
+                { header: 'Source', width: 11 },
+                { header: 'Invoice #', width: 11 },
+                { header: 'Tracking ID', width: 23 },
+                { header: 'Customer', width: 22 },
+                { header: 'Phone', width: 16 },
+                { header: 'Email', width: 26 },
+                { header: 'Items', width: 40 },
+                { header: 'Subtotal (AED)', type: 'money', width: 15 },
+                { header: 'Delivery Fee (AED)', type: 'money', width: 17 },
+                { header: 'Slot Surcharge (AED)', type: 'money', width: 19 },
+                { header: 'Discount (AED)', type: 'money', width: 15 },
+                { header: 'Coupon', width: 11 },
+                { header: 'Total (AED)', type: 'money', width: 13 },
+                { header: 'Payment Method', width: 18 },
+                { header: 'Payment Status', width: 16 },
+                { header: 'Order Status', width: 15 },
+                { header: 'Referral Code', width: 13 },
+                { header: 'Agent', width: 18 },
+                { header: 'Delivery Company', width: 20 },
+                { header: 'Fulfillment', width: 11 },
+                { header: 'Date Requested', type: 'date', width: 15 },
+                { header: 'Time Slot', width: 22 },
+                { header: 'Area', width: 15 },
+                { header: 'Address', width: 32 },
+                { header: 'Notes', width: 40 }
+            ],
+            rows
+        }]);
+        showToast('Exported ' + orders.length + ' order' + (orders.length !== 1 ? 's' : '') + ' to Excel');
     };
 
     // ── Printed tax invoices ─────────────────────────────────────────────
@@ -2088,8 +2108,8 @@ const crud = (() => {
         markPaid,
         setDeliveryCompany,
         copyTrackingId,
-        exportOrdersCsv,
-        exportCatalogueCsv,
+        exportOrdersXlsx,
+        exportCatalogueXlsx,
         printCatalogue,
         printOrder,
         openOfflineOrder,

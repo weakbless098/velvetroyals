@@ -12,7 +12,7 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="../css/styles.css?v=20260924c">
+    <link rel="stylesheet" href="../css/styles.css?v=20260925b">
     <link rel="stylesheet" href="../css/responsive.css?v=20260811b">
 </head>
 
@@ -390,16 +390,35 @@
                     <span>Every item grouped by category, with original prices.</span>
                 </div>
                 <div class="catalogue-export-actions">
-                    <button type="button" class="orders-export-btn" onclick="crud.exportCatalogueCsv()"
-                            title="Download the full catalogue as a spreadsheet">
+                    <button type="button" class="orders-export-btn" onclick="crud.exportCatalogueXlsx()"
+                            title="Download the full catalogue as an Excel spreadsheet">
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                        Download CSV
+                        Download Excel
                     </button>
                     <button type="button" class="orders-export-btn catalogue-print-btn" onclick="crud.printCatalogue()"
                             title="Open a printable price list — use your browser's Save as PDF">
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
                         Print / Save as PDF
                     </button>
+                    <button type="button" class="orders-export-btn" onclick="priceImport.open()"
+                            title="Upload an Excel or CSV file to change many prices at once">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                        Update Prices
+                    </button>
+                </div>
+            </div>
+
+            <input type="file" id="price-import-file" accept=".xlsx,.csv" hidden onchange="priceImport.onFile(this)">
+            <div id="price-import-modal" class="offline-modal-overlay" role="dialog" aria-modal="true" aria-label="Update prices from a spreadsheet" onclick="if(event.target===this)priceImport.close()">
+                <div class="offline-modal-box price-import-box">
+                    <button type="button" class="offline-modal-close" onclick="priceImport.close()" aria-label="Close">&times;</button>
+                    <h3 class="offline-modal-title">Update Prices from a Spreadsheet</h3>
+                    <p class="offline-modal-sub">Change many prices at once with an Excel (.xlsx) or CSV file. Nothing is saved until you press Apply.</p>
+                    <div id="price-import-body"></div>
+                    <div class="offline-modal-actions">
+                        <button type="button" class="button offline-cancel-btn" onclick="priceImport.close()">Cancel</button>
+                        <button type="button" class="button" id="price-import-apply" onclick="priceImport.apply()" disabled>Apply changes</button>
+                    </div>
                 </div>
             </div>
             <div class="admin-stats-grid" id="inventory-stats"></div>
@@ -428,9 +447,9 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6"></path><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><line x1="10" y1="9" x2="8" y2="9"></line></svg>
                     Create Manual Invoice
                 </button>
-                <button type="button" class="orders-export-btn" onclick="crud.exportOrdersCsv()" title="Download the orders shown below as a CSV spreadsheet">
+                <button type="button" class="orders-export-btn" onclick="crud.exportOrdersXlsx()" title="Download the orders shown below as an Excel spreadsheet">
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                    Export CSV
+                    Export Excel
                 </button>
             </div>
 
@@ -590,7 +609,7 @@
             <div class="section-header">
                 <h2>Sales Agents</h2>
                 <p class="section-subtitle">Referral codes and commission owed</p>
-                <button type="button" class="orders-export-btn" onclick="agentsAdmin.exportCsv()" title="Download a commission statement for the selected period">
+                <button type="button" class="orders-export-btn" onclick="agentsAdmin.exportXlsx()" title="Download a commission statement (Excel) for the selected period">
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                     Export Commissions
                 </button>
@@ -763,10 +782,12 @@
     <script src="../js/tracking-id.js?v=20260811b"></script>
     <script src="../js/firebase-config.js"></script>
     <script src="../js/auth.js"></script>
-    <script src="../js/crud.js?v=20260924c"></script>
+    <script src="../js/xlsx-export.js?v=20260925a"></script>
+    <script src="../js/crud.js?v=20260925b"></script>
+    <script src="../js/price-import.js?v=20260925b"></script>
     <script src="../js/reviews.js"></script>
     <script src="../js/admin-coupons.js"></script>
-    <script src="../js/admin-agents.js?v=20260811b"></script>
+    <script src="../js/admin-agents.js?v=20260925a"></script>
     <script src="../js/admin-messages.js?v=20260924c"></script>
     <script>
         // ===== Image Input Module =====

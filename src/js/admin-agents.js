@@ -256,7 +256,7 @@ const agentsAdmin = (() => {
 
     // Commission statement, one row per referred order — what you'd hand the
     // agent when paying them.
-    const exportCsv = () => {
+    const exportXlsx = () => {
         const scoped = orders.filter(o =>
             o.agentCode &&
             o.paymentStatus === 'paid' &&
@@ -265,8 +265,6 @@ const agentsAdmin = (() => {
 
         if (!scoped.length) { toast('No referred orders to export', 'warning'); return; }
 
-        const header = ['Date', 'Agent Code', 'Agent Name', 'Order ID', 'Customer',
-            'Goods Value (AED)', 'Commission Rate (%)', 'Commission (AED)', 'Order Status'];
         const rows = scoped
             .sort((a, b) => String(a.agentCode).localeCompare(String(b.agentCode))
                 || new Date(a.timestamp) - new Date(b.timestamp))
@@ -276,32 +274,35 @@ const agentsAdmin = (() => {
                 const rate = a ? (parseFloat(a.commissionRate) || 0) : 0;
                 const base = commissionBase(o);
                 return [
-                    o.timestamp ? new Date(o.timestamp).toLocaleDateString('en-GB') : '',
+                    o.timestamp || null,
                     code,
                     (a && a.name) || o.agentName || '',
                     o.key,
                     (o.customer && o.customer.name) || '',
-                    base.toFixed(2),
+                    Math.round(base * 100) / 100,
                     rate,
-                    (base * rate / 100).toFixed(2),
+                    Math.round(base * rate) / 100,
                     o.status || ''
                 ];
             });
 
-        const csv = [header].concat(rows)
-            .map(r => r.map(v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"').join(','))
-            .join('\r\n');
-
-        const blob = new Blob([String.fromCharCode(0xFEFF) + csv], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = 'velvet-royals-commissions-' +
-            (currentMonth === 'all' ? 'all-time' : currentMonth) + '.csv';
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-        setTimeout(() => URL.revokeObjectURL(link.href), 5000);
-        toast('Exported ' + rows.length + ' referred order' + (rows.length !== 1 ? 's' : ''));
+        xlsxExport.download('velvet-royals-commissions-' +
+            (currentMonth === 'all' ? 'all-time' : currentMonth) + '.xlsx', [{
+            name: 'Commissions',
+            columns: [
+                { header: 'Date', type: 'date', width: 12 },
+                { header: 'Agent Code', width: 11 },
+                { header: 'Agent Name', width: 22 },
+                { header: 'Order ID', width: 23 },
+                { header: 'Customer', width: 22 },
+                { header: 'Goods Value (AED)', type: 'money', width: 18 },
+                { header: 'Commission Rate (%)', type: 'number', width: 19 },
+                { header: 'Commission (AED)', type: 'money', width: 17 },
+                { header: 'Order Status', width: 15 }
+            ],
+            rows
+        }]);
+        toast('Exported ' + rows.length + ' referred order' + (rows.length !== 1 ? 's' : '') + ' to Excel');
     };
 
     const toast = (message, type = 'success') => {
@@ -315,5 +316,5 @@ const agentsAdmin = (() => {
         setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 3000);
     };
 
-    return { init, exportCsv };
+    return { init, exportXlsx };
 })();

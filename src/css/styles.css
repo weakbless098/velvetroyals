@@ -7556,6 +7556,42 @@ nav a {
 }
 .admin-review-delete:hover { background: #fee2e2; }
 
+/* Update Prices from a spreadsheet (admin → Inventory). */
+.price-import-box { max-width: 760px; }
+#price-import-apply:disabled { opacity: 0.45; cursor: not-allowed; }
+.price-import-steps { margin: 0 0 18px 18px; padding: 0; font-size: 0.88em; line-height: 1.7; color: var(--color-text); }
+.price-import-choose { width: 100%; }
+.price-import-last { margin-top: 16px; font-size: 0.82em; color: var(--color-text-muted); }
+.price-import-last:empty { display: none; }
+.price-import-undo,
+.price-import-again {
+    background: none; border: none; padding: 0; margin-left: 4px;
+    color: #a87010; font: inherit; font-weight: 600; text-decoration: underline; cursor: pointer;
+}
+.price-import-again { margin: 14px 0 0; font-size: 0.85em; }
+.price-import-file { font-size: 0.85em; color: var(--color-text-muted); margin: 0 0 10px; word-break: break-all; }
+.price-import-summary { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+.pi-chip { font-size: 0.76em; font-weight: 700; padding: 4px 10px; border-radius: 100px; background: var(--color-border-light); color: var(--color-text); }
+.pi-chip-change { background: #e8f6ec; color: #1a7a40; }
+.pi-chip-warn { background: #fdf0e3; color: #b35c00; }
+.pi-chip-bad { background: #fdecea; color: #b02a37; }
+.price-import-table-wrap { max-height: 42vh; overflow: auto; border: 1px solid var(--color-border-light); border-radius: 10px; }
+.price-import-table { width: 100%; border-collapse: collapse; font-size: 0.84em; }
+.price-import-table th {
+    position: sticky; top: 0; background: #faf6ec; text-align: left;
+    padding: 8px 10px; font-size: 0.85em; font-weight: 700; border-bottom: 1px solid var(--color-border-light);
+}
+.price-import-table td { padding: 8px 10px; border-bottom: 1px solid var(--color-border-light); vertical-align: top; }
+.price-import-table td:not(:first-child) { white-space: nowrap; }
+.price-import-table tr.pi-flag td { background: #fffaf2; }
+.pi-old { color: var(--color-text-muted); text-decoration: line-through; }
+.pi-same { color: var(--color-text-muted); }
+.pi-note { margin-top: 3px; font-size: 0.85em; color: #b35c00; }
+.price-import-empty { font-size: 0.88em; color: var(--color-text-muted); }
+.price-import-problems { margin-top: 14px; font-size: 0.82em; color: #8a2a2a; background: #fdf3f2; border-radius: 10px; padding: 10px 14px; }
+.price-import-problems ul { margin: 6px 0 0 18px; padding: 0; line-height: 1.6; }
+.price-import-error { font-size: 0.88em; color: #8a2a2a; background: #fdf3f2; border-radius: 10px; padding: 12px 14px; line-height: 1.6; }
+
 /* Contact messages (admin) — built on the review card above. */
 .admin-message-unread { border-left: 3px solid #c8a43a; }
 .admin-message-contact { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 0.8em; color: var(--color-text-muted); }
