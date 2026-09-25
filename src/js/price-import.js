@@ -161,11 +161,23 @@
 
     // ── Understanding the rows ───────────────────────────────────────────
     const norm = (s) => String(s ?? '').toLowerCase().replace(/\(.*?\)/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
+
+    // Header names the shop actually uses. "Revised Price" is the new regular
+    // price (shown struck through when on sale); "Final Price" is what the
+    // customer pays, i.e. the sale price.
     const HEADERS = {
-        id:    ['product id', 'id', 'product key'],
-        name:  ['item name', 'name', 'product', 'product name', 'item'],
-        price: ['original price', 'price', 'regular price', 'normal price', 'new price'],
-        sale:  ['sale price', 'sale', 'discount price', 'discounted price', 'new sale price']
+        id:       ['product id', 'id', 'product key'],
+        name:     ['item name', 'name', 'product', 'product name', 'item'],
+        category: ['category'],
+        price:    ['original price', 'revised price', 'regular price', 'normal price', 'list price', 'new price', 'price'],
+        sale:     ['sale price', 'final price', 'selling price', 'offer price', 'promo price', 'discount price', 'discounted price', 'new sale price', 'sale']
+    };
+    // Exact match first; multi-word names also match as a prefix, so
+    // "Revised Price 20%" and "Sale Price AED" are understood.
+    const headerKey = (n) => {
+        const keys = Object.keys(HEADERS);
+        return keys.find(k => HEADERS[k].includes(n)) ||
+            keys.find(k => HEADERS[k].some(h => h.includes(' ') && n.startsWith(h + ' '))) || null;
     };
 
     // The header row is the first of the top 10 rows that names a price
@@ -174,16 +186,29 @@
         for (let r = 0; r < Math.min(10, rows.length); r++) {
             const cols = {};
             (rows[r] || []).forEach((cell, i) => {
-                const n = norm(cell);
-                Object.keys(HEADERS).forEach(key => {
-                    if (cols[key] === undefined && HEADERS[key].includes(n)) cols[key] = i;
-                });
+                const key = headerKey(norm(cell));
+                if (key && cols[key] === undefined) cols[key] = i;
             });
             if ((cols.price !== undefined || cols.sale !== undefined) && (cols.id !== undefined || cols.name !== undefined)) {
                 return { row: r, cols };
             }
         }
         return null;
+    };
+
+    // Names are compared ignoring case, extra spaces and curly apostrophes.
+    const nameKey = (s) => String(s ?? '').normalize('NFC').toLowerCase()
+        .replace(/[‘’`]/g, "'").replace(/\s+/g, ' ').trim();
+
+    // "Flower" / "Flowers", "Cakes & Pastries", "Bundle Gift Set"… → stored key.
+    const categoryKey = (s) => {
+        const n = norm(s);
+        if (!n) return '';
+        for (const [prefix, key] of [['flower', 'flower'], ['arrangement', 'arrangement'], ['gift', 'gift'],
+            ['bundle', 'bundle'], ['chocolate', 'chocolates'], ['cake', 'cakes']]) {
+            if (n.startsWith(prefix)) return key;
+        }
+        return n;
     };
 
     // Accepts 120, "120", "AED 1,234.50", the "12,50" decimal comma and the
@@ -209,40 +234,88 @@
         return (s > 0 && s < price) ? round2(s) : null;
     };
 
-    // products: { id: { name, price, salePrice } } straight from /flowers.
+    // products: { id: { name, category, price, salePrice } } straight from /flowers.
     const planChanges = (rows, header, products) => {
-        const names = new Map();
-        Object.entries(products).forEach(([id, p]) => {
-            const n = String((p && p.name) || '').toLowerCase().trim();
-            if (n) names.set(n, (names.get(n) || []).concat(id));
-        });
-
         const { cols } = header;
+        const cellOf = (row, key) => cols[key] === undefined ? undefined : row[cols[key]];
         const changes = [], problems = [];
-        const seen = new Set();
-        let unchanged = 0, rowsRead = 0;
+        let rowsRead = 0, unchanged = 0;
 
+        // 1) Read the rows.
+        const records = [];
         for (let r = header.row + 1; r < rows.length; r++) {
             const row = rows[r] || [];
-            const cell = (key) => cols[key] === undefined ? undefined : row[cols[key]];
-            const idCell = String(cell('id') ?? '').trim();
-            const nameCell = String(cell('name') ?? '').trim();
-            if (!idCell && !nameCell) continue;
+            const id = String(cellOf(row, 'id') ?? '').trim();
+            const name = String(cellOf(row, 'name') ?? '').replace(/\s+/g, ' ').trim();
+            if (!id && !name) continue;
             rowsRead++;
-            const line = r + 1;       // the row number Excel shows
-            const label = nameCell || idCell;
+            records.push({
+                line: r + 1,          // the row number Excel shows
+                id, name,
+                cat: categoryKey(cellOf(row, 'category')),
+                priceCell: cellOf(row, 'price'),
+                saleCell: cellOf(row, 'sale')
+            });
+        }
 
-            let id = null;
-            if (idCell) {
-                if (products[idCell]) id = idCell;
-                else { problems.push({ line, text: '"' + label + '": no product with ID ' + idCell }); continue; }
-            } else {
-                const ids = names.get(nameCell.toLowerCase()) || [];
-                if (ids.length === 1) id = ids[0];
-                else if (!ids.length) { problems.push({ line, text: 'No product is called "' + nameCell + '"' }); continue; }
-                else { problems.push({ line, text: ids.length + ' products are called "' + nameCell + '" — use the Product ID column (download the latest Excel file)' }); continue; }
+        // 2) Work out which product each row is for.
+        const byName = new Map();
+        Object.entries(products).forEach(([pid, p]) => {
+            const k = nameKey(p && p.name);
+            if (k) byName.set(k, (byName.get(k) || []).concat(pid));
+        });
+        const matched = [];           // { rec, id, info }
+        const byNameRows = new Map(); // rows without an ID, grouped by name (+ category)
+
+        records.forEach(rec => {
+            if (rec.id) {
+                if (products[rec.id]) matched.push({ rec, id: rec.id });
+                else problems.push({ line: rec.line, text: '"' + (rec.name || rec.id) + '": no product with ID ' + rec.id });
+                return;
             }
-            if (seen.has(id)) { problems.push({ line, text: '"' + label + '" appears more than once — only the first row was used' }); continue; }
+            const group = nameKey(rec.name) + '|' + rec.cat;
+            byNameRows.set(group, (byNameRows.get(group) || []).concat(rec));
+        });
+
+        // Several products can share a name. Narrow them down by category, and
+        // when the file lists the same name/category as many times as there
+        // are such products, pair them up by price order (highest with highest).
+        const rowPrice = (rec) => {
+            const v = parseMoney(rec.priceCell);
+            const s = parseMoney(rec.saleCell);
+            return v > 0 ? v : (s > 0 ? s : 0);
+        };
+        byNameRows.forEach(group => {
+            const first = group[0];
+            let candidates = byName.get(nameKey(first.name)) || [];
+            if (!candidates.length) {
+                group.forEach(rec => problems.push({ line: rec.line, text: 'No product is called "' + rec.name + '"' }));
+                return;
+            }
+            const total = candidates.length;
+            if (first.cat) {
+                const sameCat = candidates.filter(pid => categoryKey(products[pid].category || 'flower') === first.cat);
+                if (sameCat.length) candidates = sameCat;
+            }
+            if (group.length !== candidates.length) {
+                const where = first.cat && candidates.length < total ? ' in ' + first.cat : '';
+                group.forEach(rec => problems.push({ line: rec.line, text: candidates.length + ' products are called "' + rec.name + '"' + where +
+                    ' but the file has ' + group.length + ' row' + (group.length !== 1 ? 's' : '') + ' for it — can’t tell them apart. Add a Product ID column (from Download Excel) or give the products different names.' }));
+                return;
+            }
+            const rowsSorted = group.slice().sort((a, b) => rowPrice(b) - rowPrice(a));
+            const prodSorted = candidates.slice().sort((a, b) => Number(products[b].price) - Number(products[a].price));
+            rowsSorted.forEach((rec, i) => matched.push({
+                rec, id: prodSorted[i],
+                info: total > 1 ? total + ' products share this name — matched by category and price order' : null
+            }));
+        });
+
+        // 3) Price each matched row, in file order.
+        const seen = new Set();
+        matched.sort((a, b) => a.rec.line - b.rec.line).forEach(({ rec, id, info }) => {
+            const { line } = rec;
+            if (seen.has(id)) { problems.push({ line, text: '"' + (rec.name || rec.id) + '" appears more than once — only the first row was used' }); return; }
             seen.add(id);
 
             const p = products[id];
@@ -252,31 +325,36 @@
 
             let newPrice = oldPrice;
             if (cols.price !== undefined) {
-                const v = parseMoney(cell('price'));
+                const v = parseMoney(rec.priceCell);
                 if (v !== null) {
-                    if (!(v > 0)) { problems.push({ line, text: '"' + p.name + '": original price "' + cell('price') + '" is not a valid price' }); continue; }
+                    if (!(v > 0)) { problems.push({ line, text: '"' + p.name + '": price "' + rec.priceCell + '" is not a valid price' }); return; }
                     newPrice = round2(v);
                 }
             }
 
             let newSale = oldSale;
             if (cols.sale !== undefined) {
-                const v = parseMoney(cell('sale'));
+                const v = parseMoney(rec.saleCell);
                 if (v === null) newSale = null;          // empty cell = no sale
-                else if (!(v > 0)) { problems.push({ line, text: '"' + p.name + '": sale price "' + cell('sale') + '" is not a valid price' }); continue; }
-                else if (round2(v) >= newPrice) { problems.push({ line, text: '"' + p.name + '": sale price ' + aed(round2(v)) + ' must be lower than the original price ' + aed(newPrice) }); continue; }
+                else if (!(v > 0)) { problems.push({ line, text: '"' + p.name + '": sale price "' + rec.saleCell + '" is not a valid price' }); return; }
+                else if (round2(v) === newPrice) newSale = null;   // final price = full price → not on sale
+                else if (round2(v) > newPrice) { problems.push({ line, text: '"' + p.name + '": sale price ' + aed(round2(v)) + ' is higher than the original price ' + aed(newPrice) }); return; }
                 else newSale = round2(v);
             } else if (oldSale !== null && oldSale >= newPrice) {
                 newSale = null;
                 notes.push('Sale price ' + aed(oldSale) + ' removed — it is no longer below the new price');
             }
 
-            if (newPrice === oldPrice && newSale === oldSale) { unchanged++; continue; }
+            if (newPrice === oldPrice && newSale === oldSale) { unchanged++; return; }
             if (oldPrice > 0 && Math.abs(newPrice - oldPrice) / oldPrice > 0.5) notes.push('Original price changes by more than 50% — please double-check');
             if (oldSale !== null && newSale !== null && Math.abs(newSale - oldSale) / oldSale > 0.5) notes.push('Sale price changes by more than 50% — please double-check');
-            changes.push({ id, name: String(p.name || '').trim(), line, oldPrice, newPrice, oldSale, newSale, notes });
-        }
-        return { changes, problems, unchanged, rowsRead };
+            changes.push({ id, name: String(p.name || '').trim(), line, oldPrice, newPrice, oldSale, newSale, notes, info });
+        });
+
+        const notInFile = Object.keys(products).length - seen.size;
+        changes.sort((a, b) => a.line - b.line);
+        problems.sort((a, b) => a.line - b.line);
+        return { changes, problems, unchanged, rowsRead, notInFile };
     };
 
     // ── Admin UI ─────────────────────────────────────────────────────────
@@ -320,6 +398,8 @@
                 '<li>Change the <strong>Original Price</strong> and/or <strong>Sale Price</strong> columns. Leave <strong>Product ID</strong> as it is. An empty Sale Price means no sale.</li>' +
                 '<li>Save the file and choose it below. You’ll see every change before anything is saved.</li>' +
             '</ol>' +
+            '<p class="price-import-hint">Your own sheets work too: products are found by <strong>Product ID</strong>, or by <strong>Item Name</strong> + <strong>Category</strong>. ' +
+                '<strong>Revised Price</strong> is read as the original price and <strong>Final Price</strong> as the sale price the customer pays.</p>' +
             '<button type="button" class="button price-import-choose" onclick="document.getElementById(\'price-import-file\').click()">Choose Excel or CSV file</button>' +
             '<div id="price-import-last" class="price-import-last"></div>';
         try {
@@ -335,7 +415,7 @@
     };
 
     const renderPreview = () => {
-        const { changes, problems, unchanged, rowsRead } = plan;
+        const { changes, problems, unchanged, rowsRead, notInFile } = plan;
         const flagged = changes.filter(c => c.notes.length).length;
         // Empty sale prices read as "no sale" rather than a struck-out dash.
         const show = (v) => v === null ? 'no sale' : aed(v);
@@ -351,13 +431,16 @@
                 '<span class="pi-chip">' + unchanged + ' unchanged</span>' +
                 (flagged ? '<span class="pi-chip pi-chip-warn">' + flagged + ' to double-check</span>' : '') +
                 (problems.length ? '<span class="pi-chip pi-chip-bad">' + problems.length + ' skipped</span>' : '') +
+                (notInFile ? '<span class="pi-chip">' + notInFile + ' product' + (notInFile !== 1 ? 's' : '') + ' not in file (left as they are)</span>' : '') +
             '</div>' +
             (changes.length
                 ? '<div class="price-import-table-wrap"><table class="price-import-table">' +
                     '<thead><tr><th>Product</th><th>Original price</th><th>Sale price</th></tr></thead><tbody>' +
                     changes.map(c =>
                         '<tr' + (c.notes.length ? ' class="pi-flag"' : '') + '>' +
-                            '<td>' + esc(c.name) + (c.notes.length ? '<div class="pi-note">' + c.notes.map(esc).join('<br>') + '</div>' : '') + '</td>' +
+                            '<td>' + esc(c.name) +
+                                (c.notes.length ? '<div class="pi-note">' + c.notes.map(esc).join('<br>') + '</div>' : '') +
+                                (c.info ? '<div class="pi-info">' + esc(c.info) + '</div>' : '') + '</td>' +
                             '<td>' + cell(c.oldPrice, c.newPrice) + '</td>' +
                             '<td>' + cell(c.oldSale, c.newSale) + '</td>' +
                         '</tr>').join('') +

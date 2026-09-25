@@ -293,9 +293,29 @@ const crud = (() => {
         if (typeof imgInput !== 'undefined') imgInput.reset();
     };
 
-    const handleFormSubmit = (event) => {
-        event.preventDefault();
+    // Names are compared ignoring case, spacing, accents and curly quotes, so
+    // "Éclat  de Rosé" and "eclat de rose" count as the same name.
+    const _nameKey = (s) => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '')
+        .toLowerCase().replace(/[‘’`]/g, "'").replace(/\s+/g, ' ').trim();
 
+    // Another product whose photo is the same picture (see image-fingerprint.js),
+    // or null. Products saved before fingerprints existed are skipped.
+    const findSamePhoto = (fingerprint, excludeId) => {
+        if (!fingerprint || typeof imageFingerprint === 'undefined') return null;
+        return Object.values(flowers).find(p =>
+            p.id !== excludeId && p.imageHash && imageFingerprint.isSamePhoto(fingerprint, p.imageHash)) || null;
+    };
+
+    let _saving = false;
+
+    const handleFormSubmit = async (event) => {
+        event.preventDefault();
+        if (_saving) return;            // the photo check can take a moment
+        _saving = true;
+        try { await _saveProductForm(); } finally { _saving = false; }
+    };
+
+    const _saveProductForm = async () => {
         const id          = document.getElementById('product-id').value;
         // Normalised on save as well as on blur, so a pasted or
         // autofilled name is tidied even if the field never lost focus.
@@ -333,29 +353,40 @@ const crud = (() => {
             return;
         }
 
-        const duplicate = Object.values(flowers).find(p => p.image === image && p.id !== id);
-        if (duplicate) {
-            showToast(`This image is already used by "${duplicate.name}". Please use a different image.`, 'error');
+        // The storefront shows only one product per name, so a second product
+        // with the same name would silently never appear in the shop.
+        const sameName = Object.entries(flowers).find(([key, p]) => key !== id && _nameKey(p.name) === _nameKey(name));
+        if (sameName) {
+            showToast(`Another product is already called "${String(sameName[1].name).trim()}". Please give this one a different name.`, 'error');
             return;
         }
 
-        // The storefront shows only one product per name, so a second product
-        // with the same name would silently never appear in the shop.
-        const sameName = Object.entries(flowers).find(([key, p]) =>
-            key !== id && String(p.name || '').toLowerCase().trim() === name.toLowerCase());
-        if (sameName) {
-            showToast(`Another product is already called "${sameName[1].name}". Please give this one a different name — the shop only shows one product per name.`, 'error');
+        const sameLink = Object.values(flowers).find(p => p.image === image && p.id !== id);
+        if (sameLink) {
+            showToast(`This image is already used by "${String(sameLink.name).trim()}". Please use a different image.`, 'error');
+            return;
+        }
+
+        // Same picture under a different link (re-uploaded, resized, sent
+        // through WhatsApp…). The fingerprint comes from the uploaded file;
+        // an unchanged photo keeps its stored one; a pasted link is read when
+        // its host allows it.
+        const existing = id ? flowers[id] : null;
+        let imageHash = (document.getElementById('product-image-hash') || {}).value || null;
+        if (!imageHash && existing && existing.image === image) imageHash = existing.imageHash || null;
+        if (!imageHash && typeof imageFingerprint !== 'undefined') imageHash = await imageFingerprint.fromUrl(image);
+        const samePhoto = findSamePhoto(imageHash, id);
+        if (samePhoto) {
+            showToast(`This photo is already used by "${String(samePhoto.name).trim()}". Please use a different photo.`, 'error');
             return;
         }
 
         // A tracked item at zero is sold out regardless of the toggle.
         const effectiveInStock = (stockQty !== null && stockQty === 0) ? false : inStock;
+        const data = { name, price, salePrice, description, image, imageHash, category, arrangementType, quantity, perfectFor, badge, occasion, recipient, inStock: effectiveInStock, hidden, stockQty };
 
-        if (id) {
-            updateFlower(id, { name, price, salePrice, description, image, category, arrangementType, quantity, perfectFor, badge, occasion, recipient, inStock: effectiveInStock, hidden, stockQty });
-        } else {
-            addFlower({ name, price, salePrice, description, image, category, arrangementType, quantity, perfectFor, badge, occasion, recipient, inStock: effectiveInStock, hidden, stockQty });
-        }
+        if (id) updateFlower(id, data);
+        else addFlower(data);
 
         exitEditMode();
     };
@@ -472,6 +503,8 @@ const crud = (() => {
         if (salePriceEl) salePriceEl.value = (flower.salePrice && flower.salePrice > 0) ? flower.salePrice : '';
         document.getElementById('product-description').value = flower.description;
         document.getElementById('product-image').value = flower.image;
+        const hashEl = document.getElementById('product-image-hash');
+        if (hashEl) hashEl.value = flower.imageHash || '';
         const catEl = document.getElementById('product-category');
         if (catEl) catEl.value = flower.category || 'flower';
         const atypeGroup = document.getElementById('arrangement-type-group');
@@ -2067,6 +2100,13 @@ const crud = (() => {
             { name: 'Chocolate & Rose Box', category: 'gift', price: 160, description: 'Premium Belgian chocolates nestled with a dozen mini roses in a keepsake box.', badge: '', inStock: true }
         ];
 
+        // Never add a starter whose name the shop already uses.
+        const taken = new Set(Object.values(flowers).map(p => _nameKey(p.name)));
+        const toAdd = starters.filter(s => !taken.has(_nameKey(s.name)));
+        if (!toAdd.length) { showToast('All starter products are already in the store'); return; }
+        starters.length = 0;
+        starters.push(...toAdd);
+
         let added = 0;
         starters.forEach(product => {
             const newRef = flowersRef.push();
@@ -2095,6 +2135,8 @@ const crud = (() => {
 
     return {
         init,
+        showToast,
+        findSamePhoto,
         addFlower,
         updateFlower,
         deleteFlower,

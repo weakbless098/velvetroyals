@@ -35,3 +35,6 @@ Thumbs.db
 
 # local JDK bundle (kept out of GitHub due to size limits)
 oracleJdk-26/
+
+# local data backups
+backups/

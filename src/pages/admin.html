@@ -12,7 +12,7 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="../css/styles.css?v=20260925b">
+    <link rel="stylesheet" href="../css/styles.css?v=20260925c">
     <link rel="stylesheet" href="../css/responsive.css?v=20260811b">
 </head>
 
@@ -341,6 +341,7 @@
                             </div>
 
                             <input type="hidden" id="product-image">
+                            <input type="hidden" id="product-image-hash">
                         </div>
 
                         <div class="form-actions">
@@ -783,8 +784,9 @@
     <script src="../js/firebase-config.js"></script>
     <script src="../js/auth.js"></script>
     <script src="../js/xlsx-export.js?v=20260925a"></script>
-    <script src="../js/crud.js?v=20260925b"></script>
-    <script src="../js/price-import.js?v=20260925b"></script>
+    <script src="../js/image-fingerprint.js?v=20260926a"></script>
+    <script src="../js/crud.js?v=20260926a"></script>
+    <script src="../js/price-import.js?v=20260925c"></script>
     <script src="../js/reviews.js"></script>
     <script src="../js/admin-coupons.js"></script>
     <script src="../js/admin-agents.js?v=20260925a"></script>
@@ -793,11 +795,23 @@
         // ===== Image Input Module =====
         const imgInput = (() => {
             let activeTab = 'upload';
+            const toast = (msg, type) => crud.showToast(msg, type);
 
             const setHidden = (val) => {
                 const el = document.getElementById('product-image');
                 if (el) el.value = val;
             };
+
+            // Fingerprint of the chosen photo (image-fingerprint.js), saved with
+            // the product so later uploads can be compared against it.
+            const setHash = (val) => {
+                const el = document.getElementById('product-image-hash');
+                if (el) el.value = val || '';
+            };
+
+            // The product using this same picture already, if any.
+            const photoClash = (fingerprint) =>
+                crud.findSamePhoto(fingerprint, document.getElementById('product-id').value);
 
             const switchTab = (tab) => {
                 activeTab = tab;
@@ -806,6 +820,7 @@
                 document.getElementById('img-panel-upload').style.display = tab === 'upload' ? '' : 'none';
                 document.getElementById('img-panel-url').style.display   = tab === 'url'    ? '' : 'none';
                 setHidden('');
+                setHash('');
             };
 
             const setPreview = (src) => {
@@ -848,14 +863,32 @@
                 return base || 'product-image';
             };
 
-            const uploadToStorage = (file) => {
+            const uploadToStorage = async (file) => {
                 if (!file || !file.type.startsWith('image/')) return;
 
                 // 5MB limit
                 if (file.size > 5 * 1024 * 1024) {
-                    showToast('Image too large | maximum size is 5MB', 'error');
+                    toast('Image too large | maximum size is 5MB', 'error');
                     return;
                 }
+
+                // Refuse a photo another product already uses, before anything
+                // is uploaded. Checked on the file itself, so a re-saved or
+                // WhatsApp-compressed copy is caught too.
+                let fingerprint = null;
+                try { fingerprint = await imageFingerprint.fromBlob(file); }
+                catch (e) { console.warn('Could not fingerprint this image:', e); }
+                const clash = photoClash(fingerprint);
+                if (clash) {
+                    resetDropzoneContent();
+                    setPreview(null);
+                    setHidden('');
+                    setHash('');
+                    document.getElementById('img-file-input').value = '';
+                    toast('This photo is already used by "' + String(clash.name).trim() + '". Please choose a different photo.', 'error');
+                    return;
+                }
+                setHash(fingerprint);
 
                 // Show local preview immediately for instant feedback
                 const reader = new FileReader();
@@ -864,9 +897,12 @@
 
                 setProgress(0);
 
+                // A timestamp keeps every file name unique, so an upload can
+                // never overwrite the photo of another product with the same
+                // (or no) name.
                 const productName = document.getElementById('product-name')?.value || 'product-image';
                 const extension = (file.name.includes('.') ? '.' + file.name.split('.').pop().toLowerCase() : '.jpg');
-                const safeName = slugifyProductName(productName) + extension;
+                const safeName = Date.now() + '_' + slugifyProductName(productName) + extension;
                 const storageRef = firebase.storage().ref('products/' + safeName);
                 const uploadTask = storageRef.put(file);
 
@@ -880,7 +916,8 @@
                         resetDropzoneContent();
                         setPreview(null);
                         setHidden('');
-                        showToast('Image upload failed: ' + error.message, 'error');
+                        setHash('');
+                        toast('Image upload failed: ' + error.message, 'error');
                     },
                     () => {
                         uploadTask.snapshot.ref.getDownloadURL()
@@ -893,7 +930,8 @@
                                 resetDropzoneContent();
                                 setPreview(null);
                                 setHidden('');
-                                showToast('Upload succeeded but could not get image URL. Please try again.', 'error');
+                                setHash('');
+                                toast('Upload succeeded but could not get image URL. Please try again.', 'error');
                             });
                     }
                 );
@@ -904,8 +942,10 @@
                 if (file) uploadToStorage(file);
             };
 
+            let urlCheckTimer = null;
             const onUrlChange = (url) => {
                 setHidden(url);
+                setHash('');
                 const prev = document.getElementById('img-url-preview');
                 if (!prev) return;
                 if (url) {
@@ -916,6 +956,23 @@
                 } else {
                     prev.style.display = 'none';
                 }
+                // Check the linked photo once typing pauses. Some hosts don't
+                // allow reading their pictures; then the link itself is compared
+                // when the product is saved.
+                clearTimeout(urlCheckTimer);
+                if (!url) return;
+                urlCheckTimer = setTimeout(async () => {
+                    const fingerprint = await imageFingerprint.fromUrl(url);
+                    if (document.getElementById('img-url-input').value !== url) return;   // changed meanwhile
+                    const clash = photoClash(fingerprint);
+                    if (clash) {
+                        setHidden('');
+                        prev.style.display = 'none';
+                        toast('This photo is already used by "' + String(clash.name).trim() + '". Please use a different photo.', 'error');
+                        return;
+                    }
+                    setHash(fingerprint);
+                }, 500);
             };
 
             const onDragOver  = (e) => { e.preventDefault(); document.getElementById('img-dropzone').classList.add('drag-over'); };
@@ -930,6 +987,7 @@
             // Reset image input to clean state (called by crud.js exitEditMode)
             const reset = () => {
                 setHidden('');
+                setHash('');
                 setPreview(null);
                 resetDropzoneContent();
                 document.getElementById('img-url-input').value = '';
