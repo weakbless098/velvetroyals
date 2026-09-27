@@ -461,7 +461,7 @@
                 <button class="btn-guest" onclick="authModule.continueAsGuest()">Continue as Guest</button>
             </div>
 
-            <a href="../index.html" class="auth-back">Back to store</a>
+            <a href="/" class="auth-back">Back to store</a>
         </div>
     </div>
 
@@ -609,9 +609,9 @@
 
             // Redirect by role
             if (role === 'admin') {
-                window.location.href = 'admin.html';
+                window.location.href = '/admin';
             } else {
-                window.location.href = '../index.html';
+                window.location.href = '/';
             }
         }
 

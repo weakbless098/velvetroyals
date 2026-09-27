@@ -219,9 +219,7 @@ const app = (() => {
         }
         const card = event.target.closest('.product[data-product-id]');
         if (card) {
-            const inPagesDir = window.location.pathname.includes('/pages/');
-            const base = inPagesDir ? '' : 'pages/';
-            window.location.href = base + 'product.html?id=' + encodeURIComponent(card.dataset.productId);
+            window.location.href = '/product?id=' + encodeURIComponent(card.dataset.productId);
         }
     };
 
@@ -405,7 +403,7 @@ const app = (() => {
                 && (pr.image || '').startsWith('http'));
             if (!candidates.length) continue;
             const p = candidates.sort(_byNewest)[0];
-            tiles.push('<a class="occasion-tile" href="pages/products.html?occasion=' + encodeURIComponent(key) + '">' +
+            tiles.push('<a class="occasion-tile" href="/products?occasion=' + encodeURIComponent(key) + '">' +
                 '<span class="occasion-tile-img"><img src="' + esc(p.image) + '" alt="' + esc(label) + '" loading="lazy" decoding="async"></span>' +
                 '<span class="occasion-tile-label">' + esc(label) + '</span></a>');
         }
@@ -441,7 +439,7 @@ const app = (() => {
             const ribbon = onSale
                 ? '-' + Math.round((1 - p.salePrice / p.price) * 100) + '%'
                 : 'SALE';
-            return '<a class="arrival-card" href="pages/product.html?id=' + encodeURIComponent(p.id) + '">' +
+            return '<a class="arrival-card" href="/product?id=' + encodeURIComponent(p.id) + '">' +
                 '<span class="arrival-img"><span class="arrival-ribbon">' + ribbon + '</span>' +
                 '<img src="' + esc(p.image) + '" alt="' + esc(p.name) + '" loading="lazy" decoding="async" onerror="this.onerror=null;this.src=\'https://storage.googleapis.com/flowershop-d26f4.firebasestorage.app/products/1.jpg\';"></span>' +
                 '<span class="arrival-name">' + esc(p.name) + '</span>' +
@@ -990,7 +988,7 @@ const app = (() => {
                     </div>
                     <h3>Your wishlist is empty</h3>
                     <p>Save flowers you love by tapping the heart on any product card.</p>
-                    <a href="products.html" class="button wishlist-empty-btn">Browse Collection</a>
+                    <a href="/products" class="button wishlist-empty-btn">Browse Collection</a>
                 </div>`;
             return;
         }
@@ -1651,7 +1649,7 @@ const app = (() => {
                 guestIdEl.innerHTML = `<div class="guest-order-id-box">
                     <p class="guest-order-id-label">Save your Tracking ID to track your order later:</p>
                     <code class="guest-order-id-code">${trackingId}</code>
-                    <a href="orders.html" class="guest-track-link button secondary" style="display:inline-block;margin-top:10px;font-size:0.85em;">Track Order</a>
+                    <a href="/orders" class="guest-track-link button secondary" style="display:inline-block;margin-top:10px;font-size:0.85em;">Track Order</a>
                 </div>`;
             } else {
                 guestIdEl.style.display = 'none';

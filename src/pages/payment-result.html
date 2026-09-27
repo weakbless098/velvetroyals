@@ -114,9 +114,9 @@
         <p id="message">One moment while we confirm your payment with the bank.</p>
         <div id="order-id" class="order-id" style="display:none;"></div>
         <div id="actions" style="display:none;">
-            <a class="btn" id="btn-track" href="orders.html">Track My Order</a>
-            <a class="btn" id="btn-cart" href="cart.html" style="display:none;">Return to Cart</a>
-            <a class="btn secondary" href="../index.html">Back to Shop</a>
+            <a class="btn" id="btn-track" href="/orders">Track My Order</a>
+            <a class="btn" id="btn-cart" href="/cart" style="display:none;">Return to Cart</a>
+            <a class="btn secondary" href="/">Back to Shop</a>
         </div>
         <p class="note" id="note" style="display:none;"></p>
     </div>
@@ -227,8 +227,8 @@
         if (btnCart) {
             btnCart.addEventListener('click', function (e) {
                 e.preventDefault();
-                removeUnpaidOrder().then(function () { window.location.href = 'cart.html'; });
-                setTimeout(function () { window.location.href = 'cart.html'; }, 1200);
+                removeUnpaidOrder().then(function () { window.location.href = '/cart'; });
+                setTimeout(function () { window.location.href = '/cart'; }, 1200);
             });
         }
 

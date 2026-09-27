@@ -22,7 +22,15 @@
       "**/*.so",
       "seed.html"
     ],
+    "cleanUrls": true,
+    "trailingSlash": false,
     "headers": [
+      {
+        "regex": "^/(?:[^.]*)$",
+        "headers": [
+          { "key": "Cache-Control", "value": "no-cache, must-revalidate" }
+        ]
+      },
       {
         "source": "**/*.html",
         "headers": [
@@ -57,11 +65,35 @@
         ]
       }
     ],
-    "rewrites": [
+    "redirects": [
       {
-        "source": "/__/auth/action",
-        "destination": "/pages/auth-action.html"
+        "regex": "^/pages/(products|product|cart|privacy|contact|about|terms|shipping|returns|login|wishlist|admin|orders|auth-action|payment-result)(?:\\.html)?$",
+        "destination": "/:1",
+        "type": 301
+      },
+      {
+        "regex": "^/(products|product|cart|privacy|contact|about|terms|shipping|returns|login|wishlist|admin|orders|auth-action|payment-result)/$",
+        "destination": "/:1",
+        "type": 301
       }
+    ],
+    "rewrites": [
+      { "source": "/__/auth/action", "destination": "/pages/auth-action.html" },
+      { "source": "/products", "destination": "/pages/products.html" },
+      { "source": "/product", "destination": "/pages/product.html" },
+      { "source": "/cart", "destination": "/pages/cart.html" },
+      { "source": "/privacy", "destination": "/pages/privacy.html" },
+      { "source": "/contact", "destination": "/pages/contact.html" },
+      { "source": "/about", "destination": "/pages/about.html" },
+      { "source": "/terms", "destination": "/pages/terms.html" },
+      { "source": "/shipping", "destination": "/pages/shipping.html" },
+      { "source": "/returns", "destination": "/pages/returns.html" },
+      { "source": "/login", "destination": "/pages/login.html" },
+      { "source": "/wishlist", "destination": "/pages/wishlist.html" },
+      { "source": "/admin", "destination": "/pages/admin.html" },
+      { "source": "/orders", "destination": "/pages/orders.html" },
+      { "source": "/auth-action", "destination": "/pages/auth-action.html" },
+      { "source": "/payment-result", "destination": "/pages/payment-result.html" }
     ]
   }
 }

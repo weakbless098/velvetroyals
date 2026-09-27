@@ -1,10 +1,8 @@
 ﻿const authModule = (() => {
     const getDb = () => (typeof db !== 'undefined' ? db : null);
 
-    const getLoginUrl = () => {
-        const path = window.location.pathname;
-        return path.includes('/pages/') ? 'login.html' : 'pages/login.html';
-    };
+    // Pages live at root-level addresses (/login, /admin…) — see firebase.json.
+    const getLoginUrl = () => '/login';
 
     const register = (name, email, password) => {
         return firebase.auth()
@@ -37,8 +35,7 @@
 
     const continueAsGuest = () => {
         localStorage.setItem('rv_guest', 'true');
-        const isInPages = window.location.pathname.includes('/pages/');
-        window.location.href = isInPages ? '../index.html' : 'index.html';
+        window.location.href = '/';
     };
 
     const getCurrentUser = () => firebase.auth().currentUser;
@@ -70,11 +67,15 @@
         });
     };
 
+    // Same as pageName() in utils.js — kept here because login.html loads
+    // this file without utils.js. "/pages/cart", "cart.html" → "cart".
+    const _pageName = (p) => (String(p || '').split(/[?#]/)[0].split('/').pop() || 'index').replace(/\.html$/, '');
+
     const _setActiveNavLink = () => {
-        const currentFile = window.location.pathname.split('/').pop() || 'index.html';
+        const currentFile = _pageName(window.location.pathname);
         document.querySelectorAll('nav a').forEach(link => {
-            const linkFile = (link.getAttribute('href') || '').split('/').pop();
-            if (linkFile && linkFile === currentFile) {
+            const href = link.getAttribute('href') || '';
+            if (href && !href.startsWith('#') && _pageName(href) === currentFile) {
                 link.classList.add('active');
             } else {
                 link.classList.remove('active');
@@ -94,7 +95,7 @@
     const _isGuestCached   = () => localStorage.getItem(_LS_NAV_GUEST) === '1';
 
     // Signed-in customers see "My Orders"; guests see "Track Order" —
-    // both lead to orders.html, which shows the right view for each.
+    // both lead to orders, which shows the right view for each.
     const _injectOrdersLink = (role, label) => {
         const existing = document.getElementById('nav-orders-injected');
         if (existing) existing.remove();
@@ -103,8 +104,8 @@
         const icon = text === 'Track Order'
             ? '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>'
             : '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"></path><rect x="9" y="3" width="6" height="4" rx="1" ry="1"></rect></svg>';
-        const ordersUrl  = window.location.pathname.includes('/pages/') ? 'orders.html' : 'pages/orders.html';
-        const cartLink   = document.querySelector('nav ul li a[href*="cart.html"]');
+        const ordersUrl  = '/orders';
+        const cartLink   = document.querySelector('nav ul li a[href*="cart"]');
         const li         = document.createElement('li');
         li.id            = 'nav-orders-injected';
         li.innerHTML     = '<a href="' + ordersUrl + '">' + icon + text + '</a>';
@@ -259,8 +260,7 @@
             if (!user) return; 
             getUserData(user.uid).then(data => {
                 if (data && data.role === 'admin') {
-                    const isInPages = window.location.pathname.includes('/pages/');
-                    window.location.href = isInPages ? 'admin.html' : 'pages/admin.html';
+                    window.location.href = '/admin';
                 }
             });
         });
@@ -271,14 +271,12 @@
 
     const enterPreviewMode = () => {
         sessionStorage.setItem(_PREVIEW_KEY, '1');
-        const isInPages = window.location.pathname.includes('/pages/');
-        window.location.href = isInPages ? '../index.html' : 'index.html';
+        window.location.href = '/';
     };
 
     const exitPreviewMode = () => {
         sessionStorage.removeItem(_PREVIEW_KEY);
-        const isInPages = window.location.pathname.includes('/pages/');
-        window.location.href = isInPages ? 'admin.html' : 'pages/admin.html';
+        window.location.href = '/admin';
     };
 
     const _injectPreviewBar = () => {

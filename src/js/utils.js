@@ -1,4 +1,12 @@
-﻿function formatCurrency(amount) {
+﻿// The page a path points to, the same with or without ".html":
+// "/pages/cart", "/pages/cart.html", "cart" → "cart"; "/" or "../" → "index".
+// Pages are served at clean URLs (firebase.json "cleanUrls"), but old
+// .html links still arrive via redirect and during local testing.
+function pageName(p) {
+    return (String(p || '').split(/[?#]/)[0].split('/').pop() || 'index').replace(/\.html$/, '');
+}
+
+function formatCurrency(amount) {
     return `AED ${parseFloat(amount).toFixed(2)}`;
 }
 
@@ -130,13 +138,11 @@ function initAnnouncementBar() {
     // New key: anyone who dismissed the old "opening next week" bar still
     // gets to see the "now open" one.
     const SESSION_KEY = 'rv_promo_nowopen_dismissed';
-    const EXCLUDE = ['admin.html', 'login.html', 'cart.html', 'auth-action.html'];
-    const file = (window.location.pathname.split('/').pop() || 'index.html');
-    if (EXCLUDE.includes(file)) return;
+    const EXCLUDE = ['admin', 'login', 'cart', 'auth-action'];
+    if (EXCLUDE.includes(pageName(window.location.pathname))) return;
     if (sessionStorage.getItem(SESSION_KEY) === '1') return;
 
-    const isInPages = window.location.pathname.includes('/pages/');
-    const shopUrl = (isInPages ? '' : 'pages/') + 'products.html?cat=arrangement';
+    const shopUrl = '/products?cat=arrangement';
 
     const bar = document.createElement('div');
     bar.className = 'rv-promo-bar';
@@ -209,16 +215,15 @@ function rvMatchesSearch(p, q) {
 // Submitting goes to the products page, which already reads ?q=.
 // Injected here so every page gets it without editing each HTML file.
 function initNavSearch() {
-    const EXCLUDE = ['admin.html', 'login.html', 'auth-action.html'];
-    const file = (window.location.pathname.split('/').pop() || 'index.html');
+    const EXCLUDE = ['admin', 'login', 'auth-action'];
+    const file = pageName(window.location.pathname);
     if (EXCLUDE.includes(file)) return;
 
     const headerInner = document.querySelector('.header-inner');
     if (!headerInner || headerInner.querySelector('.rv-header-search-btn')) return;
 
-    const isInPages = window.location.pathname.includes('/pages/');
-    const productsUrl = (isInPages ? '' : 'pages/') + 'products.html';
-    const productUrl  = (isInPages ? '' : 'pages/') + 'product.html';
+    const productsUrl = '/products';
+    const productUrl  = '/product';
 
     const magnifier = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>';
 
@@ -328,7 +333,7 @@ function initNavSearch() {
         const term = input.value.trim();
         if (!term) { e.preventDefault(); input.focus(); return; }
         // If already on the products page, search in place instead of reloading.
-        if (file === 'products.html' && window.app && typeof window.app.searchProducts === 'function') {
+        if (file === 'products' && window.app && typeof window.app.searchProducts === 'function') {
             e.preventDefault();
             const pageInput = document.querySelector('.products-search-input');
             if (pageInput) pageInput.value = term;
