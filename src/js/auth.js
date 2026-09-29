@@ -48,6 +48,27 @@
 
     const onAuthChange = (callback) => firebase.auth().onAuthStateChanged(callback);
 
+    // Storage rules can't read the database, so the server copies the admin
+    // role onto the sign-in token (an `admin` claim). Uploading or deleting
+    // product photos needs it; photo uploads wait for this to finish.
+    let _adminClaim = null;
+    const _syncAdminClaim = (user) => {
+        if (!_adminClaim) {
+            _adminClaim = (async () => {
+                try {
+                    if (!firebase.functions) return;
+                    const res = await firebase.functions().httpsCallable('syncAdminClaim')();
+                    const token = await user.getIdTokenResult();
+                    if (res.data && res.data.admin && token.claims.admin !== true) await user.getIdToken(true);
+                } catch (e) {
+                    console.warn('Could not refresh photo permissions:', e);
+                }
+            })();
+        }
+        return _adminClaim;
+    };
+    const adminClaimReady = () => _adminClaim || Promise.resolve();
+
     const requireAdmin = (mainContentId) => {
         const main = mainContentId ? document.getElementById(mainContentId) : null;
         if (main) main.style.display = 'none';
@@ -60,6 +81,7 @@
             getUserData(user.uid).then(data => {
                 if (data && data.role === 'admin') {
                     if (main) main.style.display = '';
+                    _syncAdminClaim(user);
                 } else {
                     window.location.href = getLoginUrl() + '?mode=admin&return=' + encodeURIComponent(window.location.href);
                 }
@@ -725,6 +747,7 @@
         getUserData,
         onAuthChange,
         requireAdmin,
+        adminClaimReady,
         updateNavAuth,
         redirectIfAdmin,
         canCheckout,

@@ -8576,3 +8576,17 @@ nav a {
 }
 .coupon-type-badge.type-percent { background: #f0f9ff; color: #0369a1; border-color: #bae6fd; }
 .coupon-type-badge.type-fixed   { background: #fef3c7; color: #d97706; border-color: #fde68a; }
+/* Clean Up Photos (admin) — reuses the price-import window styles. */
+#photo-cleanup-apply { background: #b02a37; border-color: #b02a37; }
+#photo-cleanup-apply:disabled { opacity: 0.45; cursor: not-allowed; }
+.photo-cleanup-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(64px, 1fr)); gap: 6px;
+    max-height: 34vh; overflow: auto; padding: 8px; border: 1px solid var(--color-border-light); border-radius: 10px;
+}
+.photo-cleanup-grid figure { margin: 0; aspect-ratio: 1; border-radius: 6px; overflow: hidden; background: var(--color-border-light); }
+.photo-cleanup-grid img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.photo-cleanup-hidden { display: flex; gap: 10px; align-items: flex-start; margin-top: 16px; padding: 12px 14px; border-radius: 10px; background: #faf6ec; font-size: 0.86em; cursor: pointer; }
+.photo-cleanup-hidden input { margin-top: 3px; accent-color: #b02a37; }
+.photo-cleanup-hidden small { display: block; margin-top: 3px; color: var(--color-text-muted); line-height: 1.5; }
+.photo-cleanup-kept { margin: 14px 0 0; font-size: 0.8em; color: var(--color-text-muted); line-height: 1.6; }
+.photo-cleanup-warning { margin: 10px 0 0; font-size: 0.8em; color: #8a2a2a; }

@@ -419,11 +419,16 @@ const crud = (() => {
             return;
         }
 
+        const oldPhoto = flowers[id] ? flowers[id].image : '';
         flowersRef.child(id).update({
             ...flowerData
         }).then(() => {
             console.log('Flower updated in Firebase');
             showToast('Product updated successfully');
+            // A replaced photo is removed from Storage once nothing uses it.
+            if (oldPhoto && flowerData.image && oldPhoto !== flowerData.image && typeof photoCleanup !== 'undefined') {
+                photoCleanup.deleteIfUnused(oldPhoto);
+            }
         }).catch(error => {
             console.error('Error updating flower:', error);
             showToast('Error updating product: ' + error.message, 'error');
@@ -441,9 +446,12 @@ const crud = (() => {
         const flowerName = flower ? flower.name : 'this product';
 
         openDeleteModal(flowerName, () => {
-            flowersRef.child(id).remove().then(() => {
+            const photo = flower ? flower.image : '';
+            flowersRef.child(id).remove().then(async () => {
                 console.log('Flower deleted from Firebase');
-                showToast('Product deleted successfully');
+                // Its photo goes too, unless another product or the website uses it.
+                const photoGone = typeof photoCleanup !== 'undefined' && await photoCleanup.deleteIfUnused(photo);
+                showToast(photoGone ? 'Product and its photo deleted' : 'Product deleted successfully');
             }).catch(error => {
                 console.error('Error deleting flower:', error);
                 showToast('Error deleting product: ' + error.message, 'error');

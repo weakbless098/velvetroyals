@@ -12,7 +12,7 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="../css/styles.css?v=20260925c">
+    <link rel="stylesheet" href="../css/styles.css?v=20260929a">
     <link rel="stylesheet" href="../css/responsive.css?v=20260811b">
 </head>
 
@@ -406,6 +406,11 @@
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
                         Update Prices
                     </button>
+                    <button type="button" class="orders-export-btn" onclick="photoCleanup.open()"
+                            title="Find and delete product photos that no product uses any more">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"></path></svg>
+                        Clean Up Photos
+                    </button>
                 </div>
             </div>
 
@@ -419,6 +424,18 @@
                     <div class="offline-modal-actions">
                         <button type="button" class="button offline-cancel-btn" onclick="priceImport.close()">Cancel</button>
                         <button type="button" class="button" id="price-import-apply" onclick="priceImport.apply()" disabled>Apply changes</button>
+                    </div>
+                </div>
+            </div>
+            <div id="photo-cleanup-modal" class="offline-modal-overlay" role="dialog" aria-modal="true" aria-label="Clean up unused photos" onclick="if(event.target===this)photoCleanup.close()">
+                <div class="offline-modal-box price-import-box">
+                    <button type="button" class="offline-modal-close" onclick="photoCleanup.close()" aria-label="Close">&times;</button>
+                    <h3 class="offline-modal-title">Clean Up Unused Photos</h3>
+                    <p class="offline-modal-sub">Finds product photos in storage that no product uses any more. Nothing is deleted until you press Delete.</p>
+                    <div id="photo-cleanup-body"></div>
+                    <div class="offline-modal-actions">
+                        <button type="button" class="button offline-cancel-btn" onclick="photoCleanup.close()">Close</button>
+                        <button type="button" class="button" id="photo-cleanup-apply" onclick="photoCleanup.apply()" disabled>Delete photos</button>
                     </div>
                 </div>
             </div>
@@ -778,14 +795,16 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-functions-compat.js"></script>
 
     <script src="../js/utils.js?v=20260811b"></script>
     <script src="../js/tracking-id.js?v=20260811b"></script>
     <script src="../js/firebase-config.js"></script>
-    <script src="../js/auth.js"></script>
+    <script src="../js/auth.js?v=20260929a"></script>
     <script src="../js/xlsx-export.js?v=20260925a"></script>
     <script src="../js/image-fingerprint.js?v=20260926a"></script>
-    <script src="../js/crud.js?v=20260926a"></script>
+    <script src="../js/crud.js?v=20260929a"></script>
+    <script src="../js/photo-cleanup.js?v=20260929b"></script>
     <script src="../js/price-import.js?v=20260925c"></script>
     <script src="../js/reviews.js"></script>
     <script src="../js/admin-coupons.js"></script>
@@ -903,6 +922,8 @@
                 const productName = document.getElementById('product-name')?.value || 'product-image';
                 const extension = (file.name.includes('.') ? '.' + file.name.split('.').pop().toLowerCase() : '.jpg');
                 const safeName = Date.now() + '_' + slugifyProductName(productName) + extension;
+                // Uploads need the admin claim that auth.js refreshes on page load.
+                await authModule.adminClaimReady();
                 const storageRef = firebase.storage().ref('products/' + safeName);
                 const uploadTask = storageRef.put(file);
 

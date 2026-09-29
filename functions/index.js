@@ -1006,3 +1006,41 @@ exports.sendOrderNotifications = functions.https.onCall(async (data, context) =>
     if (errors.length) console.error('Notification errors:', errors.join(' | '));
     return { ok: true, errors };
 });
+
+// ===== Admin access for product photos =====
+// Storage rules can't read the database, so an admin's role
+// (users/<uid>/role === 'admin') is copied onto their sign-in as an `admin`
+// custom claim, which storage.rules requires for uploading or deleting photos.
+const { getAuth } = require('firebase-admin/auth');
+
+const setAdminClaim = async (uid, isAdmin) => {
+    let user;
+    try { user = await getAuth().getUser(uid); }
+    catch (e) { if (e.code === 'auth/user-not-found') return false; throw e; }
+    const claims = user.customClaims || {};
+    if (!!claims.admin === isAdmin) return false;
+    const next = { ...claims };
+    if (isAdmin) next.admin = true; else delete next.admin;
+    await getAuth().setCustomUserClaims(uid, next);
+    return true;
+};
+
+// Called by the admin page on load: grants the claim to existing admins and
+// tells the page whether to refresh its sign-in token.
+exports.syncAdminClaim = functions.https.onCall(async (data, context) => {
+    if (!context.auth) throw new functions.https.HttpsError('unauthenticated', 'Sign in first.');
+    const role = (await getDatabase().ref(`users/${context.auth.uid}/role`).once('value')).val();
+    const isAdmin = role === 'admin';
+    const changed = await setAdminClaim(context.auth.uid, isAdmin);
+    return { admin: isAdmin, changed };
+});
+
+// Keeps the claim in step when a role is changed in the database, so a
+// removed admin loses photo access even if they never open the admin page.
+exports.syncAdminClaimOnRoleChange = functions.database.ref('/users/{uid}/role').onWrite(async (change, context) => {
+    const wasAdmin = change.before.val() === 'admin';
+    const isAdmin = change.after.val() === 'admin';
+    if (wasAdmin === isAdmin) return null;
+    await setAdminClaim(context.params.uid, isAdmin);
+    return null;
+});
