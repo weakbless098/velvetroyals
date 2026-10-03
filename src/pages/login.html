@@ -451,7 +451,7 @@
                 </div>
                 <div class="form-group">
                     <label for="reg-password">Password</label>
-                    <input type="password" id="reg-password" placeholder="Min. 6 characters" required autocomplete="new-password" minlength="6">
+                    <input type="password" id="reg-password" placeholder="8+ characters, with A–Z, a–z and 0–9" required autocomplete="new-password" minlength="8">
                 </div>
                 <button type="submit" class="btn-primary" id="register-submit">Create Account</button>
             </form>
@@ -469,7 +469,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="../js/firebase-config.js"></script>
-    <script src="../js/auth.js"></script>
+    <script src="../js/auth.js?v=20261003a"></script>
     <script>
         let currentMode = 'customer'; // 'customer' | 'admin'
         let currentTab  = 'login';   // 'login'    | 'register'
@@ -558,16 +558,26 @@
             const btn        = document.getElementById('register-submit');
             const emailInput = document.getElementById('reg-email');
 
-            btn.disabled = true;
-            btn.textContent = 'Creating account...';
             clearMessage();
             emailInput.style.borderColor = '';
+            const weak = passwordProblem(password);
+            if (weak) {
+                showMessage(weak, 'error');
+                document.getElementById('reg-password').focus();
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = 'Creating account...';
+            // Creating the account signs the customer in, which would trigger
+            // the redirect above before the profile is saved and the
+            // confirmation email is sent. Hold it until both are done.
+            loginAuthRedirected = true;
 
             try {
                 await authModule.register(name, email, password);
-                loginAuthRedirected = true;
-                showMessage('Account created! Redirecting...', 'success');
-                setTimeout(() => redirectAfterLogin(firebase.auth().currentUser), 1000);
+                showMessage('Account created! We sent a link to ' + email + ' to confirm your email address. Redirecting...', 'success');
+                setTimeout(() => redirectAfterLogin(firebase.auth().currentUser), 2500);
             } catch (err) {
                 if (err.code === 'auth/email-already-in-use') {
                     emailInput.style.borderColor = '#c0392b';
@@ -580,6 +590,7 @@
                 } else {
                     showMessage(friendlyError(err.code), 'error');
                 }
+                loginAuthRedirected = !!firebase.auth().currentUser;
                 btn.disabled = false;
                 btn.textContent = 'Create Account';
             }
@@ -615,6 +626,14 @@
             }
         }
 
+        function passwordProblem(pw) {
+            if (pw.length < 8) return 'Password must be at least 8 characters.';
+            if (!/[A-Z]/.test(pw)) return 'Password must include an uppercase letter (A–Z).';
+            if (!/[a-z]/.test(pw)) return 'Password must include a lowercase letter (a–z).';
+            if (!/[0-9]/.test(pw)) return 'Password must include a number (0–9).';
+            return '';
+        }
+
         function showMessage(msg, type) {
             const el = document.getElementById('auth-message');
             el.textContent = msg;
@@ -643,10 +662,12 @@
         function friendlyError(code) {
             const map = {
                 'auth/invalid-email':           'Please enter a valid email address.',
-                'auth/user-not-found':          'No account found with this email.',
-                'auth/wrong-password':          'Incorrect password. Please try again.',
+                // Same message for an unknown email and a wrong password, so the
+                // form can't be used to find out who has an account.
+                'auth/user-not-found':          'Invalid email or password.',
+                'auth/wrong-password':          'Invalid email or password.',
                 'auth/email-already-in-use':    'An account with this email already exists.',
-                'auth/weak-password':           'Password must be at least 6 characters.',
+                'auth/weak-password':           'Please choose a stronger password: 8+ characters with A–Z, a–z and 0–9.',
                 'auth/too-many-requests':       'Too many attempts. Please try again later.',
                 'auth/invalid-credential':      'Invalid email or password.'
             };
@@ -686,15 +707,20 @@
             msg.className = 'reset-message';
             msg.textContent = '';
 
+            // The answer is the same whether or not the email has an account,
+            // so this form can't be used to find out who is a customer.
+            const sent = () => {
+                msg.className = 'reset-message success';
+                msg.textContent = '✓ If an account exists for this email, a reset link is on its way. Check your inbox (and spam folder).';
+                btn.textContent = 'Sent!';
+            };
             try {
                 await firebase.auth().sendPasswordResetEmail(email);
-                msg.className = 'reset-message success';
-                msg.textContent = '✓ Reset link sent! Check your inbox (and spam folder).';
-                btn.textContent = 'Sent!';
+                sent();
             } catch (err) {
+                if (err.code === 'auth/user-not-found') { sent(); return; }
                 msg.className = 'reset-message error';
                 const errMap = {
-                    'auth/user-not-found':  'No account found with this email.',
                     'auth/invalid-email':   'Please enter a valid email address.',
                     'auth/too-many-requests': 'Too many attempts. Please try again later.'
                 };

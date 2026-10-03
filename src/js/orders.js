@@ -1,4 +1,6 @@
 ﻿const ordersModule = (() => {
+    // Order IDs are placed into the page's HTML, so only standard Firebase IDs are shown.
+    const SAFE_KEY = /^[-_A-Za-z0-9]{1,40}$/;
     // Line-art SVG icons (feather-style) — stroke follows currentColor so
     // each container's text color styles them.
     const _ICON_PATHS = {
@@ -105,7 +107,7 @@
                 ).then(snapshots => {
                     if (loading) loading.style.display = 'none';
                     const orders = snapshots
-                        .filter(s => s.exists())
+                        .filter(s => s.exists() && SAFE_KEY.test(s.key))
                         .map(s => ({ key: s.key, ...s.val() }));
                     orders.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
                     _allOrders = orders;
@@ -150,7 +152,7 @@
                 body: JSON.stringify({ id: orderId, contact })
             });
             const data = await resp.json();
-            if (!data || !data.found) {
+            if (!data || !data.found || !SAFE_KEY.test(String(data.key || ''))) {
                 resultEl.innerHTML = '<p class="lookup-msg lookup-error">No order found matching that ID and contact. Please check and try again.</p>';
                 return;
             }

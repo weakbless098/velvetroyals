@@ -723,10 +723,25 @@ exports.cleanupUnpaidOrders = functions.pubsub.schedule('every 15 minutes').onRu
 // Public on-demand version of the scheduled job. It applies exactly the same
 // rule and ignores any parameters, so calling it can only remove orders the
 // schedule would remove anyway.
+// Admins only: every call reads the whole orders list, so an open endpoint
+// could be called in a loop to run up the database bill. The scheduled job
+// above does the same work every 15 minutes.
+const isAdminRequest = async (req) => {
+    const m = String(req.get('Authorization') || '').match(/^Bearer (.+)$/);
+    if (!m) return false;
+    try {
+        const { uid } = await require('firebase-admin/auth').getAuth().verifyIdToken(m[1]);
+        return (await getDatabase().ref(`users/${uid}/role`).once('value')).val() === 'admin';
+    } catch (e) {
+        return false;
+    }
+};
+
 exports.cleanupUnpaidOrdersNow = functions.https.onRequest(async (req, res) => {
     setCors(req, res);
     if (req.method === 'OPTIONS') return res.status(204).send('');
     if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
+    if (!await isAdminRequest(req)) return res.status(403).json({ error: 'admin only' });
 
     try {
         return res.json({ removed: await removeAbandonedOrders() });

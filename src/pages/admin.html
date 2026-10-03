@@ -12,7 +12,7 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="../css/styles.css?v=20260929a">
+    <link rel="stylesheet" href="../css/styles.css?v=20261003a">
     <link rel="stylesheet" href="../css/responsive.css?v=20260811b">
 </head>
 
@@ -800,10 +800,10 @@
     <script src="../js/utils.js?v=20260811b"></script>
     <script src="../js/tracking-id.js?v=20260811b"></script>
     <script src="../js/firebase-config.js"></script>
-    <script src="../js/auth.js?v=20260929a"></script>
+    <script src="../js/auth.js?v=20261003a"></script>
     <script src="../js/xlsx-export.js?v=20260925a"></script>
     <script src="../js/image-fingerprint.js?v=20260926a"></script>
-    <script src="../js/crud.js?v=20260929a"></script>
+    <script src="../js/crud.js?v=20261003a"></script>
     <script src="../js/photo-cleanup.js?v=20260929b"></script>
     <script src="../js/price-import.js?v=20260925c"></script>
     <script src="../js/reviews.js"></script>
@@ -923,7 +923,7 @@
                 const extension = (file.name.includes('.') ? '.' + file.name.split('.').pop().toLowerCase() : '.jpg');
                 const safeName = Date.now() + '_' + slugifyProductName(productName) + extension;
                 // Uploads need the admin claim that auth.js refreshes on page load.
-                await authModule.adminClaimReady();
+                if (typeof authModule !== 'undefined') await authModule.adminClaimReady();
                 const storageRef = firebase.storage().ref('products/' + safeName);
                 const uploadTask = storageRef.put(file);
 

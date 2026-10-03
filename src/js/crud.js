@@ -960,6 +960,13 @@ const crud = (() => {
 
             if (snapshot.exists()) {
                 snapshot.forEach(child => {
+                    // Order IDs go inside the buttons' onclick code, so only
+                    // standard Firebase IDs are shown. The database rules refuse
+                    // anything else from customers; this is the second lock.
+                    if (!/^[-_A-Za-z0-9]{1,40}$/.test(child.key)) {
+                        console.warn('Skipped an order with an unsafe ID');
+                        return;
+                    }
                     const order = { key: child.key, ...child.val() };
                     allOrders.push(order);
 

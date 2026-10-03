@@ -4,16 +4,22 @@
     // Pages live at root-level addresses (/login, /admin…) — see firebase.json.
     const getLoginUrl = () => '/login';
 
+    // The link in the email brings the customer back to the sign-in page.
+    const sendVerification = (user) => user.sendEmailVerification({ url: window.location.origin + '/login' });
+
     const register = (name, email, password) => {
         return firebase.auth()
             .createUserWithEmailAndPassword(email, password)
             .then(result => {
                 return firebase.database().ref('users/' + result.user.uid).set({
                     name:      name.trim(),
-                    email:     email,
+                    email:     email.trim(),
                     role:      'user',
                     createdAt: new Date().toISOString()
-                }).then(() => ({ user: result.user, role: 'user' }));
+                })
+                    // Best effort: a mail hiccup must not fail the sign-up.
+                    .then(() => sendVerification(result.user).catch(e => console.warn('Verification email not sent:', e)))
+                    .then(() => ({ user: result.user, role: 'user' }));
             });
     };
 
@@ -212,6 +218,45 @@
             : '<a href="' + getLoginUrl() + '" class="btn-nav-signin">Sign In</a>';
     };
 
+    const _VERIFY_DISMISSED = 'rv_verify_dismissed';
+
+    const _showVerifyBar = (user) => {
+        if (document.getElementById('verify-email-bar')) return;
+        try { if (sessionStorage.getItem(_VERIFY_DISMISSED) === '1') return; } catch {}
+        const bar = document.createElement('div');
+        bar.id = 'verify-email-bar';
+        bar.className = 'verify-email-bar';
+        bar.innerHTML =
+            '<span class="verify-email-text">Please confirm your email address. We sent a link to <strong>' + escapeHtml(user.email || '') + '</strong>.</span>' +
+            '<button type="button" class="verify-email-resend">Resend link</button>' +
+            '<button type="button" class="verify-email-close" aria-label="Dismiss">&times;</button>';
+        document.body.prepend(bar);
+        const resend = bar.querySelector('.verify-email-resend');
+        resend.addEventListener('click', () => {
+            resend.disabled = true;
+            resend.textContent = 'Sending...';
+            sendVerification(user)
+                .then(() => { resend.textContent = 'Sent! Check your inbox'; })
+                .catch(e => {
+                    resend.textContent = e && e.code === 'auth/too-many-requests' ? 'Please wait a few minutes' : 'Couldn’t send. Try later';
+                    setTimeout(() => { resend.disabled = false; resend.textContent = 'Resend link'; }, 60000);
+                });
+        });
+        bar.querySelector('.verify-email-close').addEventListener('click', () => {
+            try { sessionStorage.setItem(_VERIFY_DISMISSED, '1'); } catch {}
+            bar.remove();
+        });
+    };
+
+    // Customers only; refreshes the account first so a link confirmed in
+    // another tab or on the phone is noticed.
+    const _checkEmailVerified = (user, role) => {
+        if (!user || user.emailVerified || role === 'admin' || !user.email) return;
+        user.reload()
+            .then(() => { const u = firebase.auth().currentUser; if (u && !u.emailVerified) _showVerifyBar(u); })
+            .catch(() => {});
+    };
+
     const updateNavAuth = () => {
         _setActiveNavLink();
 
@@ -230,6 +275,7 @@
                     const role = data ? data.role : 'user';
                     _saveNavCache(name, role);
                     _renderLoggedInNav(name, role);
+                    _checkEmailVerified(user, role);
                 });
             } else {
                 _clearNavCache();
@@ -346,13 +392,13 @@
                         <div class="cp-form-group">
                             <label for="cp-new-pw">New Password</label>
                             <div class="cp-input-wrap">
-                                <input type="password" id="cp-new-pw" placeholder="Min. 6 characters" required autocomplete="new-password" oninput="authModule.validateNewPassword()">
+                                <input type="password" id="cp-new-pw" placeholder="Min. 8 characters" required autocomplete="new-password" oninput="authModule.validateNewPassword()">
                                 <button type="button" class="cp-toggle-pw" onclick="authModule.togglePwVisibility('cp-new-pw', this)">${eyeClosedSvg}</button>
                             </div>
                             <div class="cp-strength-bar"><div id="cp-strength-fill" class="cp-strength-fill"></div></div>
                             <div id="cp-strength-label" class="cp-strength-label"></div>
                             <div class="cp-requirements">
-                                <div class="cp-req-item" id="cp-req-length"><span class="cp-req-icon"></span> 6+ characters</div>
+                                <div class="cp-req-item" id="cp-req-length"><span class="cp-req-icon"></span> 8+ characters</div>
                                 <div class="cp-req-item" id="cp-req-upper"><span class="cp-req-icon"></span> Uppercase</div>
                                 <div class="cp-req-item" id="cp-req-lower"><span class="cp-req-icon"></span> Lowercase</div>
                                 <div class="cp-req-item" id="cp-req-number"><span class="cp-req-icon"></span> Number</div>
@@ -436,8 +482,8 @@
 
     const getPasswordStrength = (pw) => {
         let score = 0;
-        if (pw.length >= 6) score++;
-        if (pw.length >= 10) score++;
+        if (pw.length >= 8) score++;
+        if (pw.length >= 12) score++;
         if (/[A-Z]/.test(pw)) score++;
         if (/[a-z]/.test(pw)) score++;
         if (/[0-9]/.test(pw)) score++;
@@ -465,7 +511,7 @@
         }
 
         const checks = {
-            'cp-req-length': pw.length >= 6,
+            'cp-req-length': pw.length >= 8,
             'cp-req-upper': /[A-Z]/.test(pw),
             'cp-req-lower': /[a-z]/.test(pw),
             'cp-req-number': /[0-9]/.test(pw)
@@ -524,9 +570,9 @@
         msg.className = 'cp-message';
         msg.textContent = '';
 
-        if (newPw.length < 6) {
+        if (newPw.length < 8) {
             msg.className = 'cp-message error';
-            msg.textContent = 'New password must be at least 6 characters long.';
+            msg.textContent = 'New password must be at least 8 characters long.';
             document.getElementById('cp-new-pw').focus();
             return;
         }

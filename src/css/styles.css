@@ -8590,3 +8590,20 @@ nav a {
 .photo-cleanup-hidden small { display: block; margin-top: 3px; color: var(--color-text-muted); line-height: 1.5; }
 .photo-cleanup-kept { margin: 14px 0 0; font-size: 0.8em; color: var(--color-text-muted); line-height: 1.6; }
 .photo-cleanup-warning { margin: 10px 0 0; font-size: 0.8em; color: #8a2a2a; }
+
+/* "Please confirm your email" reminder for signed-in customers (auth.js). */
+.verify-email-bar {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px 14px;
+    padding: 9px 44px 9px 16px; position: relative; background: #fdf3dc; color: var(--color-text);
+    font-size: 0.84em; line-height: 1.5; border-bottom: 1px solid var(--color-border);
+}
+.verify-email-text strong { word-break: break-all; }
+.verify-email-resend {
+    font: inherit; font-weight: 600; padding: 4px 12px; border-radius: 100px; cursor: pointer;
+    border: 1px solid var(--color-accent-dark); background: transparent; color: var(--color-primary-dark);
+}
+.verify-email-resend:disabled { opacity: 0.7; cursor: default; }
+.verify-email-close {
+    position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+    background: none; border: 0; font-size: 1.4em; line-height: 1; cursor: pointer; color: var(--color-text-muted);
+}

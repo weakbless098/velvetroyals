@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Reset your password | Velvet Royals Flowershop Artisan Floral Studio.">
-    <title>Reset Password | Velvet Royals Flowershop</title>
+    <title>Account | Velvet Royals Flowershop</title>
     <link rel="icon" type="image/png" href="../images/favicon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -513,7 +513,7 @@
             <div id="loading-state">
                 <div class="loading-container">
                     <div class="spinner"></div>
-                    <p>Verifying your reset link...</p>
+                    <p id="loading-text">Checking your link...</p>
                 </div>
             </div>
 
@@ -538,7 +538,7 @@
                         <div class="strength-bar"><div id="strength-fill" class="strength-fill"></div></div>
                         <div id="strength-label" class="strength-label"></div>
                         <div class="requirements">
-                            <div class="req-item" id="req-length"><span class="req-icon"></span> 6+ characters</div>
+                            <div class="req-item" id="req-length"><span class="req-icon"></span> 8+ characters</div>
                             <div class="req-item" id="req-upper"><span class="req-icon"></span> Uppercase</div>
                             <div class="req-item" id="req-lower"><span class="req-icon"></span> Lowercase</div>
                             <div class="req-item" id="req-number"><span class="req-icon"></span> Number</div>
@@ -567,9 +567,9 @@
                     <div class="success-icon">
                         <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                     </div>
-                    <h3>Password Updated!</h3>
-                    <p>Your password has been successfully reset. You can now sign in with your new password.</p>
-                    <a href="/login" class="btn-success">Sign In Now</a>
+                    <h3 id="success-title">Password Updated!</h3>
+                    <p id="success-text">Your password has been successfully reset. You can now sign in with your new password.</p>
+                    <a href="/login" class="btn-success" id="success-link">Sign In Now</a>
                 </div>
             </div>
 
@@ -577,7 +577,7 @@
                 <div class="reset-icon" style="background:rgba(231,76,60,0.1); color:#e74c3c;">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
                 </div>
-                <h2 class="reset-title">Link Expired</h2>
+                <h2 class="reset-title" id="error-title">Link Expired</h2>
                 <p class="reset-subtitle" id="error-description">This password reset link has expired or has already been used.</p>
                 <a href="/login" class="btn-primary" style="display:block;text-align:center;text-decoration:none;margin-top:16px;">Request a New Link</a>
                 <a href="/" class="auth-back">← Back to Store</a>
@@ -606,7 +606,78 @@
         const checkSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
 
         // ===== Init: Verify the Reset Code =====
+        // Where to go after confirming an email: only back to this site.
+        function safeContinueUrl() {
+            try {
+                const u = new URL(params.get('continueUrl') || '/', window.location.origin);
+                if (u.origin === window.location.origin) return u.pathname + u.search;
+            } catch (e) { /* fall through */ }
+            return '/';
+        }
+
+        function showDone(title, text, linkText, linkHref) {
+            document.getElementById('success-title').textContent = title;
+            document.getElementById('success-text').textContent = text;
+            const link = document.getElementById('success-link');
+            link.textContent = linkText;
+            link.setAttribute('href', linkHref);
+            showState('success');
+        }
+
+        function showLinkError(title, err) {
+            showState('error');
+            document.getElementById('error-title').textContent = title;
+            document.getElementById('error-description').textContent =
+                err && err.code === 'auth/expired-action-code' ? 'This link has expired. Please request a new one.'
+                : err && err.code === 'auth/invalid-action-code' ? 'This link has already been used or is invalid.'
+                : 'We couldn’t check this link. Please request a new one.';
+        }
+
+        // Confirms the email address on a new account.
+        async function handleVerifyEmail() {
+            document.title = 'Confirm Email | Velvet Royals Flowershop';
+            try {
+                await firebase.auth().applyActionCode(oobCode);
+                if (firebase.auth().currentUser) await firebase.auth().currentUser.reload().catch(() => {});
+                showDone('Email Confirmed', 'Thank you. Your email address is confirmed and your account is fully set up.', 'Continue', safeContinueUrl());
+            } catch (err) {
+                showLinkError('Link Not Valid', err);
+            }
+        }
+
+        // Firebase sends this to the old address when an account's email is
+        // changed. Opening it puts the old address back — how the real owner
+        // takes their account back if someone else changed it.
+        async function handleRecoverEmail() {
+            document.title = 'Undo Email Change | Velvet Royals Flowershop';
+            try {
+                const info = await firebase.auth().checkActionCode(oobCode);
+                const restored = info.data.email;
+                await firebase.auth().applyActionCode(oobCode);
+                showDone('Email Change Undone',
+                    'Your account email is back to ' + restored + '. If you didn’t ask for the change, reset your password now: someone else may know it.',
+                    'Send me a password reset link', '#');
+                const link = document.getElementById('success-link');
+                link.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    if (link.dataset.sent) return;
+                    link.textContent = 'Sending...';
+                    try {
+                        await firebase.auth().sendPasswordResetEmail(restored);
+                        link.dataset.sent = '1';
+                        link.textContent = 'Reset link sent. Check your inbox';
+                    } catch (err) {
+                        link.textContent = 'Couldn’t send. Use “Forgot password” on the sign-in page';
+                    }
+                });
+            } catch (err) {
+                showLinkError('Link Not Valid', err);
+            }
+        }
+
         async function init() {
+            if (oobCode && (mode === 'verifyEmail' || mode === 'verifyAndChangeEmail')) return handleVerifyEmail();
+            if (oobCode && mode === 'recoverEmail') return handleRecoverEmail();
             if (mode !== 'resetPassword' || !oobCode) {
                 showState('error');
                 document.getElementById('error-description').textContent =
@@ -658,8 +729,8 @@
         // ===== Password Strength =====
         function getStrength(pw) {
             let score = 0;
-            if (pw.length >= 6) score++;
-            if (pw.length >= 10) score++;
+            if (pw.length >= 8) score++;
+            if (pw.length >= 12) score++;
             if (/[A-Z]/.test(pw)) score++;
             if (/[a-z]/.test(pw)) score++;
             if (/[0-9]/.test(pw)) score++;
@@ -688,7 +759,7 @@
 
             // Update requirement checklist
             const checks = {
-                'req-length': pw.length >= 6,
+                'req-length': pw.length >= 8,
                 'req-upper': /[A-Z]/.test(pw),
                 'req-lower': /[a-z]/.test(pw),
                 'req-number': /[0-9]/.test(pw)
@@ -746,8 +817,8 @@
             msg.textContent = '';
 
             // Validate
-            if (newPw.length < 6) {
-                showMsg('New password must be at least 6 characters.', 'error');
+            if (newPw.length < 8) {
+                showMsg('New password must be at least 8 characters.', 'error');
                 return;
             }
             if (!/[A-Z]/.test(newPw)) {
