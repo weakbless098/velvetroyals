@@ -1194,6 +1194,26 @@ main {
     line-height: 1.5;
 }
 
+/* A title too long for its card wraps inside the card instead of running
+   into the next one. */
+.collection-info { padding: 0 4px; }
+.collection-info h3 { overflow-wrap: break-word; }
+
+/* Laptops and landscape tablets: seven cards in one row would be only
+   ~105–145px wide, too narrow for titles like "ARRANGEMENTS". Show two
+   centred rows (4 + 3) of full-size cards instead. Phones keep the
+   swipeable row (responsive.css, ≤960px). */
+@media (min-width: 961px) and (max-width: 1365px) {
+    .collections-grid {
+        flex-wrap: wrap;
+        max-width: 900px;
+        column-gap: 22px;
+        row-gap: 34px;
+    }
+    /* Exactly four per row (about 190–200px each), so it's always 4 + 3. */
+    .collections-grid .collection-float-wrap { flex: 0 0 calc((100% - 66px) / 4 - 1px); max-width: 200px; }
+}
+
 @keyframes collectionEntrance {
     from { opacity: 0; transform: translateY(36px); }
     to   { opacity: 1; transform: translateY(0); }

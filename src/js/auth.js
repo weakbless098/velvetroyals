@@ -667,11 +667,18 @@
         try { localStorage.removeItem(_LS_LAST_ACTIVE); } catch {}
     };
 
+    // Signs out a session left open and untouched for 8+ hours. A sign-in
+    // from the last couple of minutes is never "away": the stored time can be
+    // left over from a visit that ended by closing the browser (session-only
+    // sign-in), and counting it signed people out right after logging in.
+    const _FRESH_SIGN_IN_MS = 2 * 60 * 1000;
     const _checkLastActive = (user) => {
         if (!user) return;
         try {
+            const signedInAt = Date.parse(user.metadata && user.metadata.lastSignInTime) || 0;
+            const freshSignIn = signedInAt && Math.abs(Date.now() - signedInAt) < _FRESH_SIGN_IN_MS;
             const last = parseInt(localStorage.getItem(_LS_LAST_ACTIVE) || '0', 10);
-            if (last && (Date.now() - last) > _MAX_AWAY_MS) {
+            if (!freshSignIn && last && (Date.now() - last) > _MAX_AWAY_MS) {
                 _clearLastActive();
                 firebase.auth().signOut();
                 return;
@@ -790,10 +797,12 @@
 
     firebase.auth().onAuthStateChanged(user => {
         if (user && !user.isAnonymous) {
-            _checkLastActive(user); 
+            _checkLastActive(user);
             startSessionTimer();
         } else {
             stopSessionTimer();
+            // Nobody is signed in, so there's no open session to time out.
+            _clearLastActive();
         }
     });
 
