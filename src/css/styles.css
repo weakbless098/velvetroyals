@@ -8607,3 +8607,50 @@ nav a {
     position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
     background: none; border: 0; font-size: 1.4em; line-height: 1; cursor: pointer; color: var(--color-text-muted);
 }
+
+/* Profile photos in the account menu (auth.js). */
+.nav-profile-avatar.has-photo,
+.profile-dropdown-avatar.has-photo { padding: 0; overflow: hidden; background: #efe4cf; }
+.nav-profile-avatar.has-photo img,
+.profile-dropdown-avatar.has-photo img { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 50%; }
+
+/* My Profile window — built on the Change Password window (.cp-*). */
+.pf-modal { max-width: 460px; }
+.pf-modal .cp-body { max-height: min(78vh, 720px); overflow-y: auto; }
+.pf-photo-row { display: flex; align-items: center; gap: 18px; margin-bottom: 18px; }
+.pf-avatar {
+    width: 88px; height: 88px; border-radius: 50%; flex-shrink: 0; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, #6B4E11 0%, #4A2E05 100%); color: #F3E9D2;
+    font-family: var(--font-display); font-size: 2.2em; font-weight: 600;
+    border: 2px solid rgba(212, 175, 55, 0.5);
+}
+.pf-avatar.has-photo { background: #efe4cf; }
+.pf-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.pf-photo-actions { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; min-width: 0; }
+.pf-photo-actions small { font-size: 0.76em; color: var(--color-text-muted); line-height: 1.5; }
+.pf-upload-btn {
+    display: inline-block; padding: 8px 16px; border-radius: 100px; cursor: pointer; font-size: 0.86em; font-weight: 600;
+    background: var(--color-primary-dark); color: #F3E9D2; border: 1px solid var(--color-primary-dark);
+}
+.pf-upload-btn:hover { background: var(--color-primary); }
+.pf-link-btn {
+    background: none; border: 0; padding: 0; cursor: pointer; font: inherit; font-size: 0.86em; font-weight: 600;
+    color: var(--color-primary); text-decoration: underline; text-underline-offset: 3px;
+}
+.pf-link-btn:disabled { opacity: 0.6; cursor: default; text-decoration: none; }
+.pf-link-btn.pf-danger { color: #b02a37; }
+.pf-optional { font-weight: 400; color: var(--color-text-muted); font-size: 0.9em; }
+.pf-email-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; font-size: 0.9em; word-break: break-all; }
+.pf-chip { display: inline-block; font-size: 0.78em; font-weight: 700; padding: 2px 9px; border-radius: 100px; word-break: normal; }
+.pf-chip-ok { background: #e8f6ec; color: #1a7a40; }
+.pf-chip-warn { background: #fdf0e3; color: #b35c00; }
+.pf-security { margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--color-border-light); }
+.pf-security h4, .pf-admin-logins h4 { margin: 0 0 10px; font-size: 0.78em; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-text-muted); }
+.pf-security-actions { display: flex; flex-wrap: wrap; gap: 10px 22px; }
+.pf-security-hint { margin: 10px 0 0; font-size: 0.78em; color: var(--color-text-muted); line-height: 1.6; }
+.pf-admin-logins { margin-top: 18px; }
+.pf-admin-logins ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.pf-admin-logins li { display: grid; gap: 2px; font-size: 0.82em; padding: 8px 10px; border-radius: 8px; background: #faf6ec; }
+.pf-admin-logins li span { color: var(--color-text-muted); font-variant-numeric: tabular-nums; }
+@media (max-width: 420px) { .pf-photo-row { gap: 12px; } .pf-avatar { width: 72px; height: 72px; font-size: 1.8em; } }

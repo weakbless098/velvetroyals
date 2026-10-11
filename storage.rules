@@ -14,5 +14,19 @@ service firebase.storage {
       allow delete: if request.auth != null
                    && request.auth.token.admin == true;
     }
+
+    // Profile photos: each person manages only their own. The profile window
+    // uploads a 256px JPEG (a few KB), so 1 MB is a generous ceiling.
+    match /avatars/{uid}/{fileName} {
+      allow read: if request.auth != null
+                  && (request.auth.uid == uid || request.auth.token.admin == true);
+      allow create, update: if request.auth != null
+                   && request.auth.uid == uid
+                   && fileName.matches('avatar_[0-9]{10,16}[.]jpg')
+                   && request.resource.size < 1024 * 1024
+                   && request.resource.contentType == 'image/jpeg';
+      allow delete: if request.auth != null
+                   && (request.auth.uid == uid || request.auth.token.admin == true);
+    }
   }
 }

@@ -1047,7 +1047,50 @@ exports.syncAdminClaim = functions.https.onCall(async (data, context) => {
     const role = (await getDatabase().ref(`users/${context.auth.uid}/role`).once('value')).val();
     const isAdmin = role === 'admin';
     const changed = await setAdminClaim(context.auth.uid, isAdmin);
+    if (isAdmin) await logAdminSignIn(context).catch(e => console.error('admin sign-in log failed:', e));
     return { admin: isAdmin, changed };
+});
+
+// Records each new admin sign-in (time, device, IP) under adminLogins/ so a
+// stranger's sign-in stands out in the admin's profile window. Written by
+// the server only; a page reload in the same session isn't a new entry.
+const logAdminSignIn = async (context) => {
+    const db = getDatabase();
+    const uid = context.auth.uid;
+    const signedInAt = Number(context.auth.token.auth_time) || 0;
+    const lastRef = db.ref(`users/${uid}/lastAdminSignIn`);
+    if ((await lastRef.once('value')).val() === signedInAt) return;
+    await lastRef.set(signedInAt);
+    const req = context.rawRequest || { headers: {} };
+    const ip = String(req.headers['x-forwarded-for'] || req.ip || '').split(',')[0].trim().slice(0, 64);
+    await db.ref('adminLogins').push({
+        uid,
+        email: String(context.auth.token.email || '').slice(0, 200),
+        at: signedInAt * 1000,
+        ip,
+        userAgent: String(req.headers['user-agent'] || '').slice(0, 300)
+    });
+    // Keep the newest 100.
+    const all = await db.ref('adminLogins').orderByChild('at').once('value');
+    const keys = [];
+    all.forEach(c => { keys.push(c.key); });
+    if (keys.length > 100) {
+        const updates = {};
+        keys.slice(0, keys.length - 100).forEach(k => { updates[k] = null; });
+        await db.ref('adminLogins').update(updates);
+    }
+};
+
+// "Sign out of all devices": revokes every refresh token and records the
+// time (whole seconds, like a token's auth_time). The database rules refuse
+// any session that signed in before it, so a stolen session stops at once
+// instead of lasting until its token expires.
+exports.signOutEverywhere = functions.https.onCall(async (data, context) => {
+    if (!context.auth) throw new functions.https.HttpsError('unauthenticated', 'Sign in first.');
+    const uid = context.auth.uid;
+    await getAuth().revokeRefreshTokens(uid);
+    await getDatabase().ref(`users/${uid}/sessionsRevokedAt`).set(Math.floor(Date.now() / 1000) * 1000);
+    return { ok: true };
 });
 
 // Keeps the claim in step when a role is changed in the database, so a
