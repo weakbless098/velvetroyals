@@ -1,59 +1,55 @@
-# Flower Shop Website
+# Velvet Royals Flowershop
 
-## Overview
-The Flower Shop Website is a functional e-commerce platform that allows users to browse and purchase a variety of flower products. The website features a responsive design, ensuring a seamless experience across different devices. It includes a basic CRUD (Create, Read, Update, Delete) system for managing flower products.
+The online shop for Velvet Royals Flowershop (Oud Metha, Dubai), live at **https://velvetroyals.com**.
+Customers browse bouquets and gifts, pay by card through Geidea and track their orders; staff run
+the shop from the admin dashboard at `/admin`.
 
-## Project Structure
-```
-flowershop-website
-├── src
-│   ├── index.html          # Main entry point of the website
-│   ├── css
-│   │   ├── styles.css      # Main styles for the flower shop theme
-│   │   └── responsive.css   # Responsive styles for different screen sizes
-│   ├── js
-│   │   ├── app.js          # Main JavaScript file for application logic
-│   │   ├── crud.js         # Functions for CRUD operations on flower products
-│   │   └── utils.js        # Utility functions used throughout the application
-│   └── pages
-│       ├── products.html    # Displays the list of flower products
-│       ├── cart.html        # Shows the user's shopping cart
-│       └── admin.html       # Admin interface for managing products
-├── data
-│   └── flowers.json         # JSON file containing flower product data
-├── package.json             # npm configuration file
-├── .gitignore               # Specifies files to be ignored by Git
-└── README.md                # Documentation for the project
-```
+## How it is built
 
-## Features
-- Browse a variety of flower products with detailed descriptions and images.
-- Add products to the shopping cart and view selected items.
-- Admin interface for managing flower products, including adding, editing, and deleting items.
-- Responsive design for optimal viewing on mobile and desktop devices.
+- **Website:** plain HTML, CSS and JavaScript in `src/` (no build step).
+- **Firebase project `flowershop-d26f4`:**
+  - Hosting serves `src/` at velvetroyals.com, with short addresses such as `/products` and `/admin` (`firebase.json`).
+  - Realtime Database (asia-southeast1) holds products, orders, customers, reviews, messages, coupons and agents. Access rules: `database.rules.json`.
+  - Storage holds product photos (`products/`) and profile photos (`avatars/`). Access rules: `storage.rules`.
+  - Authentication: email and password accounts. Admins are users whose `role` is `admin` in the database.
+  - Cloud Functions in `functions/` (Node 20, us-central1): Geidea payments and webhook, stock, order cleanup,
+    order tracking, order emails, admin permissions and "sign out of all devices".
+- **Outside Firebase:** the domain and DNS are at Cloudflare, card payments go through Geidea, and order
+  emails are sent from a Gmail account.
 
-## Setup Instructions
-1. Clone the repository:
-   ```
-   git clone <repository-url>
-   ```
-2. Navigate to the project directory:
-   ```
-   cd flowershop-website
-   ```
-3. Install dependencies:
-   ```
-   npm install
-   ```
-4. Open `src/index.html` in your web browser to view the website.
+## Folders
 
-## Usage
-- Users can navigate to the products page to view available flowers and add them to their cart.
-- The cart page allows users to review their selected items and proceed to checkout.
-- Admins can access the admin page to manage flower products.
+| Path | What it is |
+| --- | --- |
+| `src/index.html`, `src/pages/` | The website pages |
+| `src/js/` | Shop logic (`app.js`), sign-in and profiles (`auth.js`), admin (`crud.js`, `price-import.js`, `photo-cleanup.js`, `admin-*.js`) |
+| `src/css/` | Styles (`styles.css`, `responsive.css`) |
+| `functions/` | Server functions (`index.js`), price checks (`pricing.js`), unpaid-order rules (`order-lifecycle.js`) and their tests |
+| `scripts/`, `tests/`, root `*.js` files | Developer tools and old test scripts. They are not part of the website and are never deployed |
 
-## Contributing
-Contributions are welcome! Please submit a pull request or open an issue for any enhancements or bug fixes.
+## Setting up
 
-## License
-This project is licensed under the MIT License.
+1. Install Node.js 20 and the Firebase tool: `npm install -g firebase-tools`, then `firebase login`.
+2. Create `functions/.env` with the secret keys. This file is never committed; the shop holds it.
+   Keys used: `GMAIL_USER`, `GMAIL_APP_PASS`, `ADMIN_EMAIL`, `GEIDEA_PUBLIC_KEY`, `GEIDEA_API_PASSWORD`,
+   `GEIDEA_API_BASE`, `GEIDEA_HPP_BASE`, `GEIDEA_WEBHOOK_ALLOW_UNSIGNED` (keep off), and optionally
+   `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_SMS_FROM`, `WHATSAPP_API_KEY`, `WHATSAPP_PHONE`.
+3. `cd functions && npm install`.
+
+## Deploying
+
+| What changed | Command |
+| --- | --- |
+| Pages, styles, scripts | `firebase deploy --only hosting` |
+| Server functions | `firebase deploy --only functions` |
+| Database rules | `firebase deploy --only database` |
+| Storage rules | `firebase deploy --only storage` |
+| Try a change privately | `firebase hosting:channel:deploy preview --expires 2d` |
+
+Browsers cache scripts and styles for a day: after changing one, raise its `?v=` number in the pages
+that load it. Function tests: `node pricing.test.js` and `node order-lifecycle.test.js` in `functions/`.
+
+## Admins
+
+Create the person's account at `/login`, then in the Firebase console set `users/<their id>/role` to
+`admin`. Their photo permissions follow automatically. Set it back to `user` to remove them.

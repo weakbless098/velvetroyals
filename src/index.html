@@ -436,19 +436,6 @@
             <p class="softopen-popup-skip" onclick="closeSoftOpenPopup()">Maybe later</p>
         </div>
     </div>
-    <div id="email-popup" class="email-popup-overlay" style="display:none;" role="dialog" aria-modal="true" aria-label="Newsletter signup" onclick="if(event.target===this)closeEmailPopup()">
-        <div class="email-popup-box">
-            <button class="email-popup-close" onclick="closeEmailPopup()" aria-label="Close">&times;</button>
-            <div class="email-popup-icon"><svg xmlns="http://www.w3.org/2000/svg" width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#c8a43a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M12 9a3 3 0 0 0 3-3c0-1.66-1.34-3-3-3S9 4.34 9 6a3 3 0 0 0 3 3z"></path><path d="M12 15a3 3 0 0 1 3 3c0 1.66-1.34 3-3 3s-3-1.34-3-3a3 3 0 0 1 3-3z"></path><path d="M9 12a3 3 0 0 0-3-3c-1.66 0-3 1.34-3 3s1.34 3 3 3a3 3 0 0 0 3-3z"></path><path d="M15 12a3 3 0 0 1 3-3c1.66 0 3 1.34 3 3s-1.34 3-3 3a3 3 0 0 1-3-3z"></path></svg></div>
-            <h3 class="email-popup-title">Get 10% Off Your First Order</h3>
-            <p class="email-popup-sub">Subscribe to our newsletter for exclusive deals, new arrivals, and floral inspiration.</p>
-            <form class="email-popup-form" onsubmit="submitEmailPopup(event)">
-                <input type="email" id="popup-email-input" class="email-popup-input" placeholder="Enter your email address" required>
-                <button type="submit" class="button email-popup-btn">Claim My 10% Discount</button>
-            </form>
-            <p class="email-popup-skip" onclick="closeEmailPopup()">No thanks, I'll pay full price</p>
-        </div>
-    </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -520,23 +507,7 @@
             authModule.updateNavAuth();
             reviewsModule.init();
 
-            // Email popup: shown once per browser, after scroll or an 8s fallback.
-            // Held back until the soft-opening popup (below) has been seen, so
-            // a first-time visitor isn't hit with two modals back to back.
-            const armEmailPopup = () => {
-                if (localStorage.getItem('rv_popup_dismissed')) return;
-                const showPopup = () => {
-                    document.getElementById('email-popup').style.display = 'flex';
-                    window.removeEventListener('scroll', onScroll);
-                    clearTimeout(fallbackTimer);
-                };
-                const onScroll = () => { if (window.scrollY > 300) showPopup(); };
-                window.addEventListener('scroll', onScroll, { passive: true });
-                const fallbackTimer = setTimeout(showPopup, 8000);
-            };
-
-            // Opening announcement: shown once ever, ahead of the email popup
-            // since it's the more time-sensitive message. The key changed when
+            // Opening announcement: shown once ever. The key changed when
             // the shop actually opened (1 Aug 2026) so everyone who had already
             // seen the "opening soon" poster still gets the "we're open" news.
             const SOFTOPEN_POPUP_KEY = 'rv_nowopen_popup_seen';
@@ -544,15 +515,12 @@
                 const el = document.getElementById('softopen-popup');
                 if (el) el.style.display = 'none';
                 localStorage.setItem(SOFTOPEN_POPUP_KEY, '1');
-                armEmailPopup();
             };
             if (!localStorage.getItem(SOFTOPEN_POPUP_KEY)) {
                 setTimeout(() => {
                     const el = document.getElementById('softopen-popup');
                     if (el) el.style.display = 'flex';
                 }, 700);
-            } else {
-                armEmailPopup();
             }
 
             // ===== Collection card animations =====
@@ -592,36 +560,6 @@
             document.querySelectorAll('.editorial-faq-item.open').forEach(function (el) { el.classList.remove('open'); });
             if (!isOpen) item.classList.add('open');
         }
-
-        function closeEmailPopup() {
-            document.getElementById('email-popup').style.display = 'none';
-            localStorage.setItem('rv_popup_dismissed', '1');
-        }
-
-        function submitEmailPopup(e) {
-            e.preventDefault();
-            const email = document.getElementById('popup-email-input').value;
-            const box = document.querySelector('.email-popup-box');
-            box.innerHTML = `
-                <div class="email-popup-success">
-                    <div style="font-size:2.5em;margin-bottom:12px;">🎉</div>
-                    <h3 style="font-family:var(--font-display);color:var(--color-primary);margin-bottom:8px;">You're in!</h3>
-                    <p style="color:var(--color-text-muted);margin-bottom:16px;">Your 10% discount code:</p>
-                    <div class="discount-code-box">WELCOME10</div>
-                    <p style="font-size:0.85em;color:var(--color-text-light);margin-top:12px;">Use it at checkout. Valid on your first order.</p>
-                    <button class="button" style="margin-top:20px;width:auto;padding:10px 28px;" onclick="closeEmailPopup()">Start Shopping</button>
-                </div>
-            `;
-            localStorage.setItem('rv_popup_dismissed', '1');
-        }
     </script>
 </body>
-
 </html>
-
-
-
-
-
-
-
